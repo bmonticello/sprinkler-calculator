@@ -7,19 +7,16 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    margin: 2rem;
+    margin: 2rem auto;
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    background: #f0f4f8;
+    background: #f9f9f9;
     color: #222;
   }
   h1 {
     text-align: center;
   }
   #description {
-    max-width: 600px;
-    margin: 0 auto 1.5rem auto;
+    margin-bottom: 1rem;
     font-size: 1rem;
     color: #444;
     text-align: center;
@@ -27,19 +24,18 @@
   label {
     display: block;
     margin-top: 1rem;
+    font-weight: bold;
   }
   input, button {
-    padding: 0.5rem;
+    padding: 0.4rem 0.6rem;
     font-size: 1rem;
-    margin-top: 0.3rem;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 6px;
+    margin-top: 0.2rem;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    transition: border-color 0.3s ease;
+    box-sizing: border-box;
   }
   input:focus {
-    border-color: #4a90e2;
+    border-color: #007bff;
     outline: none;
   }
   #zones-container {
@@ -49,31 +45,34 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 0.75rem;
+    align-items: center;
   }
-  .zone-row input.zone-name {
+  /* Zone name input - same width */
+  .zone-name {
     flex: 2;
   }
-  .zone-row input.zone-rate {
+  /* Make runtime input wider: was flex: 1 before, now flex: 1.5 and min-width */
+  .zone-rate {
     flex: 1.5;
     min-width: 80px;
   }
+  /* Make remove button bigger and easier to tap */
   .zone-row button {
     background: #dc3545;
     color: white;
     border: none;
-    border-radius: 6px;
-    width: 40px;
+    border-radius: 5px;
+    width: 36px;
     height: 36px;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     line-height: 1;
     cursor: pointer;
     flex-shrink: 0;
     padding: 0;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease;
   }
   .zone-row button:hover {
-    background: #b02a37;
-    box-shadow: 0 0 8px rgba(176, 42, 55, 0.7);
+    background-color: #b02a37;
   }
   .input-labels {
     display: flex;
@@ -89,14 +88,12 @@
     flex: 2;
   }
   button#addZoneBtn, button#calculateBtn, button#resetBtn {
-    width: auto;
-    padding: 0.6rem 1.5rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1.25rem;
     font-weight: bold;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
   }
   button#addZoneBtn {
     background-color: #007bff;
@@ -109,9 +106,9 @@
     background-color: #28a745;
     color: white;
     display: block;
-    margin: 1.5rem auto 0 auto;
     width: 100%;
     max-width: 300px;
+    margin: 1.5rem auto 0 auto;
   }
   button#calculateBtn:hover {
     background-color: #1e7e34;
@@ -128,7 +125,7 @@
     margin-top: 2rem;
     white-space: pre-line;
     background: white;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
     border-radius: 8px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     max-width: 600px;
@@ -138,10 +135,12 @@
   @media (max-width: 480px) {
     .zone-row {
       flex-direction: column;
+      align-items: stretch;
     }
-    .zone-row input, .zone-row button {
-      width: 100%;
+    .zone-name, .zone-rate, .zone-row button {
       flex: none !important;
+      width: 100%;
+      min-width: auto;
     }
     .input-labels {
       flex-direction: column;
@@ -149,7 +148,7 @@
     .input-labels > div {
       width: 100%;
       flex: none;
-      margin-top: 0.25rem;
+      margin-top: 0.3rem;
     }
     button#calculateBtn {
       max-width: 100%;
@@ -182,7 +181,7 @@
 <div class="input-labels">
   <div class="zone-name-label">Sprinkler Zone Name</div>
   <div>Minutes per 1" Water</div>
-  <div style="width: 40px;"></div>
+  <div style="width: 36px;"></div>
 </div>
 <div id="zones-container"></div>
 
@@ -195,7 +194,6 @@
 <div id="results"></div>
 
 <script>
-  // Utility functions
   function createZoneRow(name = "", rate = "") {
     const div = document.createElement("div");
     div.className = "zone-row";
@@ -228,7 +226,6 @@
     return div;
   }
 
-  // Save/load from localStorage
   function saveSettings() {
     const latitude = document.getElementById("latitude").value;
     const longitude = document.getElementById("longitude").value;
@@ -271,16 +268,10 @@
     }
   }
 
-  // Fetch weather data from Open-Meteo
   async function fetchWeatherData(lat, lon) {
     const today = new Date();
-    const startDate = today.toISOString().slice(0,10);
-    const endDateObj = new Date();
-    endDateObj.setDate(today.getDate() + 6);
-    const endDate = endDateObj.toISOString().slice(0,10);
-
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-      `&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
+      `&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&timezone=auto&models=gfs_seamless`;
 
     const resp = await fetch(url);
     if(!resp.ok) throw new Error("Failed to fetch weather data");
@@ -291,10 +282,9 @@
     return arr.reduce((a,b) => a + b, 0);
   }
 
-  // Calculate runtime formula: W*(ET%*ET - R)*rate, where W = watering freq (days/7)
   function calculateRuntime(ratePerInch, ET, R, wateringFrequencyDays, etReplacementPercent) {
-    const W = wateringFrequencyDays ? wateringFrequencyDays / 7 : 2/7;  // default 2/7
-    const etReplace = etReplacementPercent ? etReplacementPercent / 100 : 0.75; // default 0.75
+    const W = wateringFrequencyDays ? wateringFrequencyDays / 7 : 2/7;
+    const etReplace = etReplacementPercent ? etReplacementPercent / 100 : 0.75;
     const adjustedInches = W * (etReplace * ET - R);
     if(adjustedInches <= 0) return 0;
     return adjustedInches * ratePerInch;
@@ -307,13 +297,11 @@
     return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
   }
 
-  // Clear results if empty input (prevent blank white box)
   function clearResults() {
     const output = document.getElementById("results");
     output.textContent = "";
   }
 
-  // Main calculation function
   async function calculateSprinklerTimes() {
     const output = document.getElementById("results");
     output.textContent = "Fetching weather data...";
@@ -366,7 +354,6 @@
         return `${name}: ${formatMinutes(runtime)}`;
       });
 
-      // Show basic text results
       let resultText = 
         `Weekly ET: ${weeklyET.toFixed(3)} inches\n` +
         `Predicted 7-Day Rainfall: ${weeklyRainfall.toFixed(3)} inches\n\n` +
@@ -374,8 +361,6 @@
         resultLines.join("\n");
 
       output.textContent = resultText;
-
-      // Save current settings to localStorage
       saveSettings();
 
     } catch(error) {
@@ -383,21 +368,17 @@
     }
   }
 
-  // Add new zone button handler
   document.getElementById("addZoneBtn").addEventListener("click", () => {
     const container = document.getElementById("zones-container");
     container.appendChild(createZoneRow());
     saveSettings();
   });
 
-  // Calculate button handler
   document.getElementById("calculateBtn").addEventListener("click", calculateSprinklerTimes);
 
-  // Reset button handler with confirm
   document.getElementById("resetBtn").addEventListener("click", () => {
     if(confirm("Reset all inputs to default values? This will clear saved settings.")) {
       localStorage.removeItem("sprinklerSettings");
-      // Clear inputs
       document.getElementById("latitude").value = "";
       document.getElementById("longitude").value = "";
       document.getElementById("wateringFrequency").value = "";
@@ -407,18 +388,15 @@
     }
   });
 
-  // Save changes on input changes for zones and settings
   document.getElementById("latitude").addEventListener("input", saveSettings);
   document.getElementById("longitude").addEventListener("input", saveSettings);
   document.getElementById("wateringFrequency").addEventListener("input", saveSettings);
   document.getElementById("etReplacement").addEventListener("input", saveSettings);
   document.getElementById("zones-container").addEventListener("input", saveSettings);
 
-  // Load saved settings on page load
   window.addEventListener("DOMContentLoaded", () => {
     const loaded = loadSettings();
     if (!loaded) {
-      // If no saved data, add one empty zone row
       document.getElementById("zones-container").appendChild(createZoneRow());
     }
   });
