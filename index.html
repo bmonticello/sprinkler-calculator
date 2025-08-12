@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sprinkler Calculator</title>
+<title>Sprinkler Runtime Calculator</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 2rem; max-width: 600px; }
   label { display: block; margin-top: 1rem; }
@@ -36,18 +36,6 @@
 <div id="results"></div>
 
 <script>
-  // Location coordinates
-  const LATITUDE = 47.94;
-  const LONGITUDE = -122.21;
-
-  // Sprinkler zones configuration (name and minutes per inch)
-  const sprinklers = [
-    { name: "Front Yard", ratePerInch: 240 },
-    { name: "Upper Backyard", ratePerInch: 320 },
-    { name: "Bottom Backyard", ratePerInch: 120 }
-  ];
-
-  // Constants
   const wateringFrequency = 2 / 7;  // watering every 2 days
   const etReplacement = 0.75;       // 75% ET replacement
 
@@ -68,14 +56,14 @@
     return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
   }
 
-  async function fetchWeatherData() {
+  async function fetchWeatherData(lat, lon) {
     const today = new Date();
     const startDate = today.toISOString().slice(0, 10);
     const endDateObj = new Date();
     endDateObj.setDate(today.getDate() + 6);
     const endDate = endDateObj.toISOString().slice(0, 10);
 
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE}&longitude=${LONGITUDE}` +
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
       `&daily=precipitation_sum,et0_fao_evapotranspiration&timezone=America/Los_Angeles` +
       `&start_date=${startDate}&end_date=${endDate}`;
 
@@ -85,11 +73,20 @@
   }
 
   async function calculateSprinklerTimes() {
-    const output = document.getElementById("output");
+    const output = document.getElementById("results");
     output.textContent = "Fetching weather data...";
 
+    const lat = parseFloat(document.getElementById("latitude").value);
+    const lon = parseFloat(document.getElementById("longitude").value);
+
+    const sprinklerInput = document.getElementById("sprinklers").value;
+    const sprinklers = sprinklerInput.split(",").map(item => {
+      const [name, rate] = item.split(":");
+      return { name: name.trim(), ratePerInch: parseFloat(rate.trim()) };
+    });
+
     try {
-      const data = await fetchWeatherData();
+      const data = await fetchWeatherData(lat, lon);
 
       if (!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
         output.textContent = "Incomplete weather data received.";
@@ -115,9 +112,8 @@
     }
   }
 
-  document.getElementById("calculate").addEventListener("click", calculateSprinklerTimes);
+  document.getElementById("calculateBtn").addEventListener("click", calculateSprinklerTimes);
 </script>
 
 </body>
 </html>
-
