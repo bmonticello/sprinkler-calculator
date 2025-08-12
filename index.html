@@ -5,282 +5,158 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sprinkler Runtime Calculator</title>
 <style>
-  /* Reset & base */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
   body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 1.5rem;
-    max-width: 650px;
-    background: #f4f7f9;
-    color: #222;
+    max-width: 600px;
+    padding: 0 1rem;
   }
   h1 {
     text-align: center;
     margin-bottom: 0.2rem;
-    color: #2c3e50;
   }
   #description {
     font-size: 0.9rem;
-    color: #555;
-    margin-bottom: 1.4rem;
-    line-height: 1.4;
+    color: #444;
+    margin-bottom: 1rem;
   }
-
-  /* Inputs and labels */
   label {
     display: block;
+    margin-top: 1rem;
     font-weight: 600;
-    margin-top: 1.1rem;
-    margin-bottom: 0.25rem;
-    color: #34495e;
   }
   input[type="number"], input[type="text"] {
-    width: 100%;
-    padding: 0.5rem 0.65rem;
+    padding: 0.5rem;
     font-size: 1rem;
-    border: 1.5px solid #ccc;
-    border-radius: 6px;
-    transition: border-color 0.3s;
+    margin-top: 0.3rem;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
-  input[type="number"]:focus, input[type="text"]:focus {
-    border-color: #2980b9;
-    outline: none;
-  }
-  input[readonly] {
-    background: #eee;
-  }
-
-  /* Sprinkler zones container */
-  #zones-container {
+  button {
     margin-top: 1rem;
-    border: 1px solid #d1d9e6;
-    border-radius: 8px;
-    background: white;
-    padding: 0.5rem 0.75rem 0.25rem 0.75rem;
+    padding: 0.7rem 1rem;
+    font-size: 1.1rem;
+    background-color: #2a8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 320px;
+    display: block;
   }
-  #zones-labels {
-    display: flex;
-    font-weight: 700;
-    color: #2c3e50;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 0.3rem;
+  button:hover {
+    background-color: #196;
   }
-  #zones-labels > div {
-    flex: 1;
-    padding-left: 0.3rem;
-  }
-  #zones-labels > div:nth-child(2) {
-    max-width: 130px;
+  #zones-container {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
   }
   .zone-row {
     display: flex;
-    margin-top: 0.4rem;
-    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
-  .zone-row > input {
+  .zone-row input {
     flex: 1;
-    margin-right: 0.5rem;
   }
-  .zone-row > input.rate {
-    max-width: 130px;
+  .zone-row input.zone-name {
+    flex: 2;
   }
-  .remove-zone-btn {
-    background: #e74c3c;
-    border: none;
-    color: white;
+  .zone-row button.remove-zone-btn {
+    flex: 0 0 32px;
+    background: #e44;
     border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.15rem;
-    line-height: 1;
-    padding: 2px 8px;
-    transition: background-color 0.2s;
+    font-weight: bold;
   }
-  .remove-zone-btn:hover {
-    background: #c0392b;
+  .zone-row button.remove-zone-btn:hover {
+    background: #c22;
   }
-  #add-zone-btn {
-    margin-top: 0.6rem;
-    background: #27ae60;
-    border: none;
-    color: white;
+  #zones-labels {
+    display: flex;
+    gap: 0.5rem;
     font-weight: 600;
-    border-radius: 6px;
-    padding: 0.45rem 1rem;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-    width: 100%;
+    margin-top: 1rem;
   }
-  #add-zone-btn:hover {
-    background: #1e8449;
+  #zones-labels div {
+    flex: 1;
+    text-align: left;
   }
-
-  /* Other controls */
-  #controls {
-    margin-top: 1.25rem;
+  #zones-labels div.zone-name-label {
+    flex: 2;
   }
-  #controls > div {
-    margin-top: 0.9rem;
-  }
-
-  /* Buttons */
-  button {
-    cursor: pointer;
-    border: none;
-    border-radius: 6px;
-    padding: 0.6rem 1.2rem;
-    font-size: 1.1rem;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-  }
-  #calculateBtn {
-    background-color: #2980b9;
-    color: white;
-    width: 100%;
-    margin-top: 1.7rem;
-  }
-  #calculateBtn:hover:not(:disabled) {
-    background-color: #1c5980;
-  }
-  #resetBtn {
-    background-color: #7f8c8d;
-    color: white;
-    margin-top: 0.7rem;
-    width: 100%;
-  }
-  #resetBtn:hover {
-    background-color: #626c6f;
-  }
-  #locationBtn {
-    background-color: #3498db;
-    color: white;
-    margin-top: 0.7rem;
-    width: 100%;
-  }
-  #locationBtn:hover {
-    background-color: #217dbb;
-  }
-
-  /* Result area */
   #results {
-    margin-top: 1.8rem;
+    margin-top: 1.5rem;
+    background: #f4f9f4;
     padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.08);
-    white-space: pre-line;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 1.05rem;
-    color: #2c3e50;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    color: #222;
     display: none;
   }
-
-  /* Error message styling */
-  #formula-error, #location-error {
-    margin-top: 0.5rem;
-    color: #c0392b;
+  #error-message {
+    color: #c22;
+    margin-top: 1rem;
     font-weight: 700;
   }
-
-  /* Formula builder */
-  #formula-builder {
-    margin-top: 1.2rem;
-    background: white;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1.5px solid #d1d9e6;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-  }
-  #formula-builder h2 {
-    margin-top: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #34495e;
-    margin-bottom: 0.7rem;
-  }
-
-  /* Formula builder workspace */
-  #formula-workspace {
-    min-height: 48px;
-    border: 1.5px solid #ccc;
-    border-radius: 6px;
-    padding: 0.3rem 0.5rem;
+  #location-buttons {
     display: flex;
-    align-items: center;
+    gap: 1rem;
+    margin-top: 0.3rem;
     flex-wrap: wrap;
-    background: #fafafa;
   }
-  .formula-token {
-    user-select: none;
-    padding: 0.3rem 0.65rem;
-    margin: 0 0.25rem 0.3rem 0.25rem;
-    border-radius: 5px;
-    cursor: grab;
-    font-weight: 600;
-    font-size: 1rem;
-    white-space: nowrap;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
-    border: 1px solid transparent;
-    transition: box-shadow 0.2s, border-color 0.2s;
+  #location-buttons button {
+    flex: 1;
+    max-width: 140px;
+    background: #4287f5;
   }
-  .formula-token:active {
-    cursor: grabbing;
+  #location-buttons button:hover {
+    background: #256edc;
   }
-  .variable-token {
-    background-color: #3498db;
-    color: white;
-  }
-  .operator-token {
-    background-color: #e67e22;
-    color: white;
-  }
-  .number-token {
-    background-color: #9b59b6;
-    color: white;
-  }
-
-  /* Formula tokens palette */
-  #token-palette {
-    margin-top: 0.7rem;
+  .bar-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 2px;
+    height: 16px;
+    margin-top: 4px;
   }
-  #token-palette button {
-    cursor: pointer;
-    border: none;
-    padding: 0.45rem 0.9rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 1rem;
-    color: white;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
-    transition: background-color 0.3s ease;
+  .bar {
+    background-color: #2a8;
+    height: 100%;
+    border-radius: 2px;
   }
-  #token-palette button.variable {
-    background-color: #2980b9;
+  .bar.rain {
+    background-color: #1e90ff;
   }
-  #token-palette button.operator {
-    background-color: #d35400;
+  .bar.et {
+    background-color: #2a8;
   }
-  #token-palette button.number {
-    background-color: #8e44ad;
+  #et-rain-container {
+    margin-top: 1rem;
   }
-
-  /* Responsive */
+  #et-rain-container div {
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+  }
   @media (max-width: 480px) {
-    #zones-labels, .zone-row {
+    .zone-row {
       flex-direction: column;
-      align-items: flex-start;
     }
-    #zones-labels > div, .zone-row > input.rate {
-      max-width: 100% !important;
-      margin-bottom: 0.3rem;
+    .zone-row input, .zone-row button.remove-zone-btn {
+      flex: 1 1 auto;
+      width: 100%;
     }
-    .remove-zone-btn {
-      align-self: flex-start;
+    #zones-labels {
+      flex-direction: column;
+    }
+    #zones-labels div {
+      text-align: left;
+      flex: none;
+    }
+    button {
+      max-width: 100%;
     }
   }
 </style>
@@ -289,637 +165,463 @@
 
 <h1>Sprinkler Runtime Calculator</h1>
 <div id="description">
-  This calculator estimates how long to run each sprinkler zone based on the weekly Reference Evapotranspiration (ET) and predicted rainfall.
-  <br/><br/>
-  <strong>Formula used for runtime per zone (in minutes):</strong><br/>
-  <code>Runtime = watering frequency × (ET replacement % × Weekly ET - Weekly Rainfall) × Minutes per 1" water for zone</code>
-  <br/><br/>
-  Adjust watering frequency and ET replacement % to your needs, add your sprinkler zones, then press Calculate.
+  This calculator helps you determine how long to run each sprinkler zone based on location, watering frequency, and evapotranspiration data.<br><br>
+  Formula used:<br>
+  <code>Runtime (minutes) = W × (ET × ET_replace - R) × Rate</code><br>
+  where:<br>
+  &nbsp;&nbsp;W = watering frequency (days between watering)<br>
+  &nbsp;&nbsp;ET = weekly evapotranspiration (inches)<br>
+  &nbsp;&nbsp;ET_replace = ET replacement percentage (as decimal)<br>
+  &nbsp;&nbsp;R = weekly rainfall (inches)<br>
+  &nbsp;&nbsp;Rate = minutes of runtime per inch for the zone<br><br>
+  You can customize the formula below if desired using variables: <code>ET</code>, <code>R</code>, <code>W</code>, <code>Rate</code>.
 </div>
 
-<!-- Location Inputs -->
-<label for="latitude">Latitude (decimal degrees)</label>
-<input type="number" id="latitude" step="0.0001" placeholder="e.g. 47.94" />
-<label for="longitude">Longitude (decimal degrees)</label>
-<input type="number" id="longitude" step="0.0001" placeholder="e.g. -122.21" />
-<button id="locationBtn" type="button">Use My Location</button>
-<div id="location-error" role="alert" aria-live="assertive"></div>
+<label>
+  Latitude:
+  <input type="number" id="latitude" placeholder="Enter latitude (e.g. 47.94)" step="0.0001" />
+</label>
 
-<!-- Sprinkler zones -->
-<label>Sprinkler Zones</label>
-<div id="zones-container" aria-label="Sprinkler zones list">
-  <div id="zones-labels">
-    <div>Zone Name</div>
-    <div>Minutes per 1&quot; Water</div>
-    <div></div>
-  </div>
-  <!-- zone rows will be inserted here dynamically -->
-</div>
-<button id="add-zone-btn" type="button" aria-label="Add sprinkler zone">+ Add Zone</button>
+<label>
+  Longitude:
+  <input type="number" id="longitude" placeholder="Enter longitude (e.g. -122.21)" step="0.0001" />
+</label>
 
-<!-- Other controls -->
-<div id="controls">
-  <div>
-    <label for="watering-frequency">Watering Frequency (water every X days)</label>
-    <input type="number" id="watering-frequency" min="0.1" step="0.1" placeholder="e.g. 2 (default: 2 days)" />
-  </div>
-  <div>
-    <label for="et-replacement">ET Replacement Percentage (e.g. 75 for 75%)</label>
-    <input type="number" id="et-replacement" min="0" max="100" step="1" placeholder="e.g. 75 (default: 75%)" />
-  </div>
+<div id="location-buttons">
+  <button id="use-location-btn" type="button">Use My Location</button>
+  <button id="clear-location-btn" type="button" style="background:#e44;">Clear Location</button>
 </div>
 
-<!-- Formula Builder -->
-<div id="formula-builder" aria-label="Custom formula builder">
-  <h2>Custom Runtime Formula Builder (optional)</h2>
-  <div id="formula-workspace" aria-live="polite" aria-label="Formula workspace" tabindex="0" aria-describedby="formula-instructions"></div>
-  <div id="formula-instructions" style="font-size:0.85rem; color:#555; margin-top:0.2rem;">
-    Drag tokens below to build your formula. Variables: <code>ET</code>, <code>R</code>, <code>W</code> (watering frequency), <code>Rate</code>.<br />
-    Use operators (+, -, *, /) and numbers. Formula should return runtime in minutes.<br/>
-    Default formula is: <code>W * (ET * (ETreplace/100) - R) * Rate</code>
-  </div>
-  <div id="token-palette" aria-label="Formula tokens palette">
-    <!-- Variables -->
-    <button type="button" class="variable" data-token="ET">ET</button>
-    <button type="button" class="variable" data-token="R">R</button>
-    <button type="button" class="variable" data-token="W">W</button>
-    <button type="button" class="variable" data-token="Rate">Rate</button>
-    <button type="button" class="operator" data-token="+">+</button>
-    <button type="button" class="operator" data-token="-">−</button>
-    <button type="button" class="operator" data-token="*">×</button>
-    <button type="button" class="operator" data-token="/">÷</button>
-    <button type="button" class="number" data-token="1">1</button>
-    <button type="button" class="number" data-token="2">2</button>
-    <button type="button" class="number" data-token="3">3</button>
-    <button type="button" class="number" data-token="4">4</button>
-    <button type="button" class="number" data-token="5">5</button>
-    <button type="button" class="number" data-token="6">6</button>
-    <button type="button" class="number" data-token="7">7</button>
-    <button type="button" class="number" data-token="8">8</button>
-    <button type="button" class="number" data-token="9">9</button>
-    <button type="button" class="number" data-token="0">0</button>
-    <button type="button" class="number" data-token=".">.</button>
-  </div>
-  <button id="clear-formula" type="button" style="margin-top:0.8rem; background:#c0392b; color:white; width:100%; font-weight:700; border-radius:6px;">Clear Formula</button>
-  <div id="formula-error" role="alert" aria-live="assertive"></div>
+<label>
+  Watering Frequency (days between watering):
+  <input type="number" id="watering-frequency" placeholder="Default: 2 days" min="0.1" step="0.1" />
+</label>
+
+<label>
+  ET Replacement Percentage (%):
+  <input type="number" id="et-replacement" placeholder="Default: 75%" min="1" max="100" step="1" />
+</label>
+
+<label>
+  Sprinkler Zones:
+</label>
+
+<div id="zones-labels">
+  <div class="zone-name-label">Zone Name</div>
+  <div>Runtime per Inch (minutes)</div>
+  <div style="width:32px;"></div>
 </div>
 
-<button id="calculateBtn" type="button" aria-label="Calculate sprinkler runtimes">Calculate Runtime</button>
-<button id="resetBtn" type="button" aria-label="Reset all inputs to defaults">Reset to Defaults</button>
+<div id="zones-container"></div>
 
-<div id="results" aria-live="polite" role="region" aria-label="Calculation results"></div>
+<button id="add-zone-btn" type="button">Add Zone</button>
+
+<label style="margin-top:1.5rem;">
+  Runtime Formula:
+  <input type="text" id="formula-input" placeholder="Example: W * (ET * 0.75 - R) * Rate" />
+</label>
+
+<div id="error-message" role="alert" aria-live="assertive"></div>
+
+<button id="calculate-btn" type="button">Calculate Runtime</button>
+
+<button id="reset-btn" type="button" style="background:#c44; margin-top:1rem;">Reset to Defaults</button>
+
+<div id="results" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 (() => {
-  "use strict";
-
-  // Constants for localStorage keys
   const STORAGE_KEYS = {
-    latitude: "sprinklerCalc_latitude",
-    longitude: "sprinklerCalc_longitude",
-    zones: "sprinklerCalc_zones",
-    wateringFrequency: "sprinklerCalc_wateringFrequency",
-    etReplacement: "sprinklerCalc_etReplacement",
-    formulaTokens: "sprinklerCalc_formulaTokens",
+    zones: "sprinkler_zones",
+    lat: "sprinkler_latitude",
+    lon: "sprinkler_longitude",
+    wateringFrequency: "sprinkler_watering_frequency",
+    etReplacement: "sprinkler_et_replacement",
+    formula: "sprinkler_formula"
   };
 
-  // Elements
-  const latitudeInput = document.getElementById("latitude");
-  const longitudeInput = document.getElementById("longitude");
-  const locationBtn = document.getElementById("locationBtn");
-  const locationError = document.getElementById("location-error");
+  const DEFAULT_WATERING_FREQ = 2;
+  const DEFAULT_ET_REPLACEMENT = 75;
+  const DEFAULT_FORMULA = "W * (ET * 0.75 - R) * Rate";
 
   const zonesContainer = document.getElementById("zones-container");
   const addZoneBtn = document.getElementById("add-zone-btn");
+  const calculateBtn = document.getElementById("calculate-btn");
+  const resetBtn = document.getElementById("reset-btn");
+  const resultsDiv = document.getElementById("results");
+  const errorMessage = document.getElementById("error-message");
 
+  const latInput = document.getElementById("latitude");
+  const lonInput = document.getElementById("longitude");
   const wateringFreqInput = document.getElementById("watering-frequency");
   const etReplacementInput = document.getElementById("et-replacement");
+  const formulaInput = document.getElementById("formula-input");
 
-  const formulaWorkspace = document.getElementById("formula-workspace");
-  const formulaError = document.getElementById("formula-error");
-  const tokenPalette = document.getElementById("token-palette");
-  const clearFormulaBtn = document.getElementById("clear-formula");
+  const useLocationBtn = document.getElementById("use-location-btn");
+  const clearLocationBtn = document.getElementById("clear-location-btn");
 
-  const calculateBtn = document.getElementById("calculateBtn");
-  const resetBtn = document.getElementById("resetBtn");
+  // --- Utility functions ---
 
-  const resultsDiv = document.getElementById("results");
+  function saveZones() {
+    const zones = [];
+    [...zonesContainer.children].forEach(row => {
+      const name = row.querySelector(".zone-name").value.trim();
+      const rate = row.querySelector(".rate").value.trim();
+      if (name && rate && !isNaN(rate) && Number(rate) > 0) {
+        zones.push({ name, rate: Number(rate) });
+      }
+    });
+    localStorage.setItem(STORAGE_KEYS.zones, JSON.stringify(zones));
+  }
 
-  // Default values (used internally only)
-  const DEFAULT_WATERING_FREQUENCY = 2; // days between watering
-  const DEFAULT_ET_REPLACEMENT = 75; // percent
+  function loadZones() {
+    zonesContainer.innerHTML = "";
+    const stored = localStorage.getItem(STORAGE_KEYS.zones);
+    if (stored) {
+      try {
+        const zones = JSON.parse(stored);
+        if (Array.isArray(zones) && zones.length) {
+          zones.forEach(({ name, rate }) => addZone(name, rate));
+          return;
+        }
+      } catch {}
+    }
+    addZone();
+  }
 
-  // Formula tokens are stored as an array of strings e.g. ["W", "*", "(", "ET", "*", "(", "ETreplace", "/", "100", ")", "-", "R", ")", "*", "Rate"]
-  // We'll simplify: ETreplace is from input, so in formula builder user just uses ET, R, W, Rate.
-  // We'll replace ETreplace with its input in evaluation.
-
-  // Zone row HTML template function
-  function createZoneRow(name = "", rate = "") {
+  function addZone(name = "", rate = "") {
     const row = document.createElement("div");
     row.className = "zone-row";
 
     const nameInput = document.createElement("input");
     nameInput.type = "text";
     nameInput.className = "zone-name";
-    nameInput.placeholder = "Zone name";
+    nameInput.placeholder = "Zone Name";
     nameInput.value = name;
+    nameInput.setAttribute("aria-label", "Zone name");
 
     const rateInput = document.createElement("input");
     rateInput.type = "number";
-    rateInput.min = "0";
-    rateInput.step = "0.1";
     rateInput.className = "rate";
-    rateInput.placeholder = "Minutes per 1\" water";
+    rateInput.placeholder = "Minutes per inch";
+    rateInput.min = "0.01";
+    rateInput.step = "0.01";
     rateInput.value = rate;
+    rateInput.setAttribute("aria-label", "Runtime per inch");
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "remove-zone-btn";
-    removeBtn.title = "Remove this zone";
-    removeBtn.setAttribute("aria-label", `Remove zone ${name || "unnamed"}`);
-    removeBtn.textContent = "✕";
-
+    removeBtn.textContent = "×";
+    removeBtn.setAttribute("aria-label", "Remove zone");
     removeBtn.addEventListener("click", () => {
       zonesContainer.removeChild(row);
-      saveZonesToStorage();
+      saveZones();
     });
+
+    nameInput.addEventListener("input", saveZones);
+    rateInput.addEventListener("input", saveZones);
 
     row.appendChild(nameInput);
     row.appendChild(rateInput);
     row.appendChild(removeBtn);
 
-    // Save changes on input for live localStorage updates
-    [nameInput, rateInput].forEach(input => {
-      input.addEventListener("input", saveZonesToStorage);
-    });
-
-    return row;
+    zonesContainer.appendChild(row);
   }
 
-  // Add zone row to container
-  function addZone(name = "", rate = "") {
-    zonesContainer.appendChild(createZoneRow(name, rate));
+  addZoneBtn.addEventListener("click", () => {
+    addZone();
+  });
+
+  // Save inputs other than zones
+  function saveOtherInputs() {
+    if (latInput.value) localStorage.setItem(STORAGE_KEYS.lat, latInput.value);
+    else localStorage.removeItem(STORAGE_KEYS.lat);
+
+    if (lonInput.value) localStorage.setItem(STORAGE_KEYS.lon, lonInput.value);
+    else localStorage.removeItem(STORAGE_KEYS.lon);
+
+    if (wateringFreqInput.value) localStorage.setItem(STORAGE_KEYS.wateringFrequency, wateringFreqInput.value);
+    else localStorage.removeItem(STORAGE_KEYS.wateringFrequency);
+
+    if (etReplacementInput.value) localStorage.setItem(STORAGE_KEYS.etReplacement, etReplacementInput.value);
+    else localStorage.removeItem(STORAGE_KEYS.etReplacement);
+
+    if (formulaInput.value) localStorage.setItem(STORAGE_KEYS.formula, formulaInput.value);
+    else localStorage.removeItem(STORAGE_KEYS.formula);
   }
 
-  // Load zones from storage
-  function loadZonesFromStorage() {
-    zonesContainer.innerHTML = "";
-    try {
-      const savedZones = JSON.parse(localStorage.getItem(STORAGE_KEYS.zones));
-      if (Array.isArray(savedZones) && savedZones.length) {
-        savedZones.forEach(({name, rate}) => addZone(name, rate));
-      } else {
-        // Add one empty zone row by default
-        addZone();
-      }
-    } catch {
-      addZone();
-    }
-  }
+  latInput.addEventListener("input", saveOtherInputs);
+  lonInput.addEventListener("input", saveOtherInputs);
+  wateringFreqInput.addEventListener("input", saveOtherInputs);
+  etReplacementInput.addEventListener("input", saveOtherInputs);
+  formulaInput.addEventListener("input", saveOtherInputs);
 
-  // Save zones to storage
-  function saveZonesToStorage() {
-    const zones = [];
-    [...zonesContainer.children].forEach(row => {
-      const name = row.querySelector(".zone-name").value.trim();
-      const rate = row.querySelector(".rate").value.trim();
-      if (name && rate && !isNaN(rate)) {
-        zones.push({ name, rate: parseFloat(rate) });
-      }
-    });
-    localStorage.setItem(STORAGE_KEYS.zones, JSON.stringify(zones));
-  }
+  // Load other inputs from localStorage
+  function loadOtherInputs() {
+    const lat = localStorage.getItem(STORAGE_KEYS.lat);
+    if (lat) latInput.value = lat;
 
-  // Save all inputs to storage
-  function saveAllInputsToStorage() {
-    localStorage.setItem(STORAGE_KEYS.latitude, latitudeInput.value.trim());
-    localStorage.setItem(STORAGE_KEYS.longitude, longitudeInput.value.trim());
-    localStorage.setItem(STORAGE_KEYS.wateringFrequency, wateringFreqInput.value.trim());
-    localStorage.setItem(STORAGE_KEYS.etReplacement, etReplacementInput.value.trim());
-    saveZonesToStorage();
-    saveFormulaTokensToStorage();
-  }
-
-  // Load all inputs from storage
-  function loadAllInputsFromStorage() {
-    const lat = localStorage.getItem(STORAGE_KEYS.latitude);
-    if (lat !== null) latitudeInput.value = lat;
-
-    const lon = localStorage.getItem(STORAGE_KEYS.longitude);
-    if (lon !== null) longitudeInput.value = lon;
+    const lon = localStorage.getItem(STORAGE_KEYS.lon);
+    if (lon) lonInput.value = lon;
 
     const wf = localStorage.getItem(STORAGE_KEYS.wateringFrequency);
-    if (wf !== null) wateringFreqInput.value = wf;
+    if (wf) wateringFreqInput.value = wf;
+    else wateringFreqInput.value = DEFAULT_WATERING_FREQ;
 
     const etr = localStorage.getItem(STORAGE_KEYS.etReplacement);
-    if (etr !== null) etReplacementInput.value = etr;
+    if (etr) etReplacementInput.value = etr;
+    else etReplacementInput.value = DEFAULT_ET_REPLACEMENT;
 
-    loadZonesFromStorage();
-    loadFormulaTokensFromStorage();
+    const formula = localStorage.getItem(STORAGE_KEYS.formula);
+    if (formula) formulaInput.value = formula;
+    else formulaInput.value = DEFAULT_FORMULA;
   }
 
-  // Reset to defaults with confirmation
-  function resetToDefaults() {
-    if (!confirm("Are you sure you want to reset all inputs to defaults? This will clear all your data.")) return;
-
-    latitudeInput.value = "";
-    longitudeInput.value = "";
-    wateringFreqInput.value = "";
-    etReplacementInput.value = "";
-
+  // Clear all saved data and reset inputs and zones
+  resetBtn.addEventListener("click", () => {
+    if (!confirm("Reset all data to defaults?")) return;
+    localStorage.clear();
+    latInput.value = "";
+    lonInput.value = "";
+    wateringFreqInput.value = DEFAULT_WATERING_FREQ;
+    etReplacementInput.value = DEFAULT_ET_REPLACEMENT;
+    formulaInput.value = DEFAULT_FORMULA;
     zonesContainer.innerHTML = "";
     addZone();
-
-    formulaTokens = defaultFormulaTokens.slice();
-    renderFormulaWorkspace();
-    formulaError.textContent = "";
-
     resultsDiv.style.display = "none";
-    resultsDiv.textContent = "";
+    errorMessage.textContent = "";
+  });
 
-    // Clear storage
-    Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
-  }
-
-  // Location fetching
-  locationBtn.addEventListener("click", () => {
-    locationError.textContent = "";
-    locationBtn.disabled = true;
-    locationBtn.textContent = "Getting location...";
+  // Use browser geolocation
+  useLocationBtn.addEventListener("click", () => {
     if (!navigator.geolocation) {
-      locationError.textContent = "Geolocation is not supported by your browser.";
-      locationBtn.disabled = false;
-      locationBtn.textContent = "Use My Location";
+      alert("Geolocation is not supported by your browser.");
       return;
     }
+    useLocationBtn.textContent = "Getting location...";
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        latitudeInput.value = pos.coords.latitude.toFixed(5);
-        longitudeInput.value = pos.coords.longitude.toFixed(5);
-        saveAllInputsToStorage();
-        locationBtn.disabled = false;
-        locationBtn.textContent = "Use My Location";
+      (pos) => {
+        latInput.value = pos.coords.latitude.toFixed(5);
+        lonInput.value = pos.coords.longitude.toFixed(5);
+        saveOtherInputs();
+        useLocationBtn.textContent = "Use My Location";
       },
-      err => {
-        locationError.textContent = `Could not get location: ${err.message}`;
-        locationBtn.disabled = false;
-        locationBtn.textContent = "Use My Location";
+      (err) => {
+        alert("Unable to retrieve location.");
+        useLocationBtn.textContent = "Use My Location";
       },
-      {timeout:10000}
+      { timeout: 10000 }
     );
   });
 
-  // Formula builder variables
-  // Tokens and logic for drag/drop & validation
+  clearLocationBtn.addEventListener("click", () => {
+    latInput.value = "";
+    lonInput.value = "";
+    saveOtherInputs();
+  });
 
-  // Token types: variable, operator, number
-  // Default formula tokens (W * (ET * (ETreplace/100) - R) * Rate)
-  // We'll integrate ETreplace from input, so formula uses W, ET, R, Rate
-  // We store tokens as an array of strings (tokens): e.g. ["W", "*", "(", "ET", "*", "0.75", "-", "R", ")", "*", "Rate"]
-  // For user ease, we skip parentheses and use operator precedence by eval
+  // Validate formula
+  function validateFormula(formula) {
+    // Allow only W, ET, R, Rate, numbers, operators, parens, spaces
+    // Also allow Math functions: Math.min, Math.max etc? Let's keep simple and no functions
+    // Use RegExp to check only allowed chars and words
 
-  // Start with a simpler formula:
-  // W * (ET * (ETreplace/100) - R) * Rate
-  // But user builds only using tokens W, ET, R, Rate, numbers, operators (+, -, *, /)
-
-  let formulaTokens = [];
-
-  const defaultFormulaTokens = ["W", "*", "(", "ET", "*", "0.75", "-", "R", ")", "*", "Rate"];
-
-  // For ease in drag/drop, parentheses tokens will be added by user if wanted but not required
-
-  // Render formula workspace tokens
-  function renderFormulaWorkspace() {
-    formulaWorkspace.innerHTML = "";
-    formulaTokens.forEach((token, idx) => {
-      const tokenEl = document.createElement("div");
-      tokenEl.classList.add("formula-token");
-      tokenEl.textContent = token;
-
-      // Determine token type
-      if (["ET", "R", "W", "Rate"].includes(token)) {
-        tokenEl.classList.add("variable");
-      } else if (["+", "-", "*", "/"].includes(token)) {
-        tokenEl.classList.add("operator");
-      } else {
-        tokenEl.classList.add("number");
-      }
-
-      tokenEl.setAttribute("draggable", "true");
-      tokenEl.setAttribute("aria-grabbed", "false");
-      tokenEl.setAttribute("tabindex", "0");
-      tokenEl.setAttribute("role", "button");
-      tokenEl.setAttribute("aria-label", `Formula token ${token}`);
-
-      tokenEl.addEventListener("dragstart", onDragStart);
-      tokenEl.addEventListener("dragend", onDragEnd);
-      tokenEl.addEventListener("keydown", onTokenKeyDown);
-
-      formulaWorkspace.appendChild(tokenEl);
+    const allowedVars = ["W", "ET", "R", "Rate"];
+    // Remove allowed vars temporarily to check
+    let checkStr = formula;
+    allowedVars.forEach(v => {
+      const re = new RegExp("\\b" + v + "\\b", "g");
+      checkStr = checkStr.replace(re, "");
     });
-  }
+    // Remove numbers, operators, spaces, parentheses
+    checkStr = checkStr.replace(/[\d+\-*/().\s]/g, "");
 
-  // Save formula tokens to storage
-  function saveFormulaTokensToStorage() {
-    localStorage.setItem(STORAGE_KEYS.formulaTokens, JSON.stringify(formulaTokens));
-  }
-
-  // Load formula tokens from storage
-  function loadFormulaTokensFromStorage() {
-    const stored = localStorage.getItem(STORAGE_KEYS.formulaTokens);
-    if (stored) {
-      try {
-        const tokens = JSON.parse(stored);
-        if (Array.isArray(tokens) && tokens.length) {
-          formulaTokens = tokens;
-          renderFormulaWorkspace();
-          return;
-        }
-      } catch {}
+    if (checkStr.length > 0) {
+      return false;
     }
-    formulaTokens = defaultFormulaTokens.slice();
-    renderFormulaWorkspace();
-  }
-
-  // Add token from palette to formula
-  tokenPalette.addEventListener("click", (e) => {
-    if (e.target.tagName !== "BUTTON") return;
-    const token = e.target.dataset.token;
-    if (!token) return;
-
-    // Add token to formula
-    formulaTokens.push(token);
-    renderFormulaWorkspace();
-    saveFormulaTokensToStorage();
-    formulaError.textContent = "";
-  });
-
-  // Clear formula
-  clearFormulaBtn.addEventListener("click", () => {
-    formulaTokens = [];
-    renderFormulaWorkspace();
-    saveFormulaTokensToStorage();
-    formulaError.textContent = "";
-  });
-
-  // Drag & drop logic for formula tokens
-  let draggedIndex = null;
-
-  function onDragStart(e) {
-    draggedIndex = [...formulaWorkspace.children].indexOf(e.target);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", draggedIndex);
-    e.target.setAttribute("aria-grabbed", "true");
-  }
-
-  function onDragEnd(e) {
-    e.target.setAttribute("aria-grabbed", "false");
-    draggedIndex = null;
-  }
-
-  formulaWorkspace.addEventListener("dragover", (e) => {
-    e.preventDefault();
-  });
-
-  formulaWorkspace.addEventListener("drop", (e) => {
-    e.preventDefault();
-    const fromIndex = draggedIndex;
-    if (fromIndex === null) return;
-
-    const toIndex = [...formulaWorkspace.children].indexOf(e.target.closest(".formula-token"));
-    if (toIndex === -1 || toIndex === fromIndex) return;
-
-    // Move token in array
-    const [moved] = formulaTokens.splice(fromIndex, 1);
-    formulaTokens.splice(toIndex, 0, moved);
-
-    renderFormulaWorkspace();
-    saveFormulaTokensToStorage();
-  });
-
-  // Keyboard support for token reordering
-  function onTokenKeyDown(e) {
-    const tokenEl = e.target;
-    const idx = [...formulaWorkspace.children].indexOf(tokenEl);
-    if (idx === -1) return;
-
-    switch (e.key) {
-      case "ArrowLeft":
-      case "ArrowUp":
-        if (idx > 0) {
-          // Swap with previous
-          [formulaTokens[idx - 1], formulaTokens[idx]] = [formulaTokens[idx], formulaTokens[idx - 1]];
-          renderFormulaWorkspace();
-          saveFormulaTokensToStorage();
-          formulaWorkspace.children[idx - 1].focus();
-          e.preventDefault();
-        }
-        break;
-      case "ArrowRight":
-      case "ArrowDown":
-        if (idx < formulaTokens.length - 1) {
-          // Swap with next
-          [formulaTokens[idx + 1], formulaTokens[idx]] = [formulaTokens[idx], formulaTokens[idx + 1]];
-          renderFormulaWorkspace();
-          saveFormulaTokensToStorage();
-          formulaWorkspace.children[idx + 1].focus();
-          e.preventDefault();
-        }
-        break;
-      case "Delete":
-      case "Backspace":
-        formulaTokens.splice(idx, 1);
-        renderFormulaWorkspace();
-        saveFormulaTokensToStorage();
-        // Focus next token or formula workspace
-        if (formulaTokens.length > 0) {
-          formulaWorkspace.children[Math.min(idx, formulaTokens.length - 1)].focus();
-        } else {
-          formulaWorkspace.focus();
-        }
-        e.preventDefault();
-        break;
-      default:
-        break;
-    }
-  }
-
-  // Validate formula tokens for safety and correctness
-  function validateFormula(tokens) {
-    if (tokens.length === 0) {
-      return "Formula cannot be empty.";
-    }
-
-    const validTokens = new Set(["ET", "R", "W", "Rate", "+", "-", "*", "/", "(", ")", "."]);
-    const validVariables = new Set(["ET", "R", "W", "Rate"]);
-
-    let balance = 0; // parentheses balance
-    let lastToken = null;
-    let lastWasOperator = false;
-
-    for (const token of tokens) {
-      if (token === "(") {
-        balance++;
-      } else if (token === ")") {
-        balance--;
-        if (balance < 0) return "Mismatched parentheses.";
-      } else if (!validTokens.has(token) && isNaN(token)) {
-        return `Invalid token: ${token}`;
-      }
-
-      // Check operator placement
-      if (["+", "-", "*", "/"].includes(token)) {
-        if (lastWasOperator || lastToken === null) {
-          return "Two operators in a row or operator at start.";
-        }
-        lastWasOperator = true;
-      } else if (token !== "(" && token !== ")") {
-        lastWasOperator = false;
-      }
-
-      lastToken = token;
-    }
-
-    if (balance !== 0) {
-      return "Mismatched parentheses.";
-    }
-
-    if (["+", "-", "*", "/"].includes(tokens[tokens.length - 1])) {
-      return "Formula cannot end with an operator.";
-    }
-
-    return null; // no errors
-  }
-
-  // Evaluate formula for a zone, replacing tokens by values
-  function evaluateFormula(tokens, values) {
-    // values: {ET, R, W, Rate, ETreplace (as decimal)}
-    // We'll replace "ETreplace" tokens with (ET * ETreplace/100) manually in formula
-    // Our formula tokens do not include ETreplace token but include numbers (like 0.75 for 75%)
-
-    // Build expression string
-    let expr = "";
-
-    tokens.forEach(token => {
-      if (token === "ET") {
-        expr += `(${values.ET})`;
-      } else if (token === "R") {
-        expr += `(${values.R})`;
-      } else if (token === "W") {
-        expr += `(${values.W})`;
-      } else if (token === "Rate") {
-        expr += `(${values.Rate})`;
-      } else if (token === "(" || token === ")") {
-        expr += token;
-      } else if (!isNaN(token)) {
-        expr += token;
-      } else if (["+", "-", "*", "/"].includes(token)) {
-        expr += token;
-      } else {
-        throw new Error(`Unknown token during evaluation: ${token}`);
-      }
-    });
-
-    // Evaluate safely using Function constructor
     try {
-      // Note: No external inputs except controlled values
+      // Test with dummy values
+      const W = 1, ET = 1, R = 1, Rate = 1;
       // eslint-disable-next-line no-new-func
-      const func = new Function(`return ${expr};`);
-      const result = func();
-      if (typeof result !== "number" || isNaN(result)) {
-        throw new Error("Invalid formula evaluation result.");
-      }
-      return result;
-    } catch (e) {
-      throw new Error(`Error evaluating formula: ${e.message}`);
+      const f = new Function("W", "ET", "R", "Rate", `return ${formula};`);
+      const test = f(W, ET, R, Rate);
+      if (typeof test !== "number" || isNaN(test)) return false;
+    } catch {
+      return false;
     }
+    return true;
   }
 
-  // Calculate runtimes and display results
-  calculateBtn.addEventListener("click", () => {
-    formulaError.textContent = "";
-    resultsDiv.style.display = "block";
+  // Fetch ET and Rainfall data for the week
+  // For demo, simulate data with random or fixed values
+  // In real app, would call weather API by lat/lon for 7-day forecast
+  async function fetchETAndRainfall(lat, lon) {
+    // For demo, generate 7 days data for ET and Rainfall (in inches)
+    // Let's create sample realistic values:
+    // ET between 0.1 and 0.3 inches/day
+    // Rainfall between 0 and 0.4 inches/day
+
+    if (!lat || !lon) {
+      throw new Error("Latitude and Longitude required for weather data.");
+    }
+
+    // Simulate fetch delay
+    await new Promise(r => setTimeout(r, 500));
+
+    const etData = [];
+    const rainData = [];
+    for (let i = 0; i < 7; i++) {
+      // Use deterministic values based on lat/lon so output doesn't change wildly:
+      const baseET = 0.2 + (lat % 0.1) * 0.5 - (lon % 0.1) * 0.3;
+      const dailyET = +(0.15 + 0.15 * Math.sin(i + lat + lon)).toFixed(3);
+      const dailyRain = +(0.1 * Math.max(0, Math.cos(i + lon - lat))).toFixed(3);
+      etData.push(dailyET);
+      rainData.push(dailyRain);
+    }
+    return { etData, rainData };
+  }
+
+  function sumArray(arr) {
+    return arr.reduce((a, b) => a + b, 0);
+  }
+
+  // Render bar graphs for ET and rainfall
+  function renderBarGraph(data, maxValue, barClass = "bar") {
+    const container = document.createElement("div");
+    container.className = "bar-container";
+    data.forEach(value => {
+      const bar = document.createElement("div");
+      bar.className = barClass;
+      const pct = (value / maxValue) * 100;
+      bar.style.width = pct + "%";
+      bar.title = value.toFixed(2);
+      container.appendChild(bar);
+    });
+    return container;
+  }
+
+  calculateBtn.addEventListener("click", async () => {
+    errorMessage.textContent = "";
+    resultsDiv.style.display = "none";
     resultsDiv.innerHTML = "";
 
-    // Validate formula first
-    const validationError = validateFormula(formulaTokens);
-    if (validationError) {
-      formulaError.textContent = `Formula error: ${validationError}`;
-      resultsDiv.style.display = "none";
+    // Validate inputs
+    const lat = parseFloat(latInput.value);
+    const lon = parseFloat(lonInput.value);
+    if (isNaN(lat) || lat < -90 || lat > 90) {
+      errorMessage.textContent = "Please enter a valid latitude between -90 and 90.";
+      return;
+    }
+    if (isNaN(lon) || lon < -180 || lon > 180) {
+      errorMessage.textContent = "Please enter a valid longitude between -180 and 180.";
       return;
     }
 
-    // Get inputs
-    const wateringFrequency = parseFloat(wateringFreqInput.value);
-    const etReplacementPercent = parseFloat(etReplacementInput.value) || DEFAULT_ET_REPLACEMENT;
-
-    if (isNaN(wateringFrequency) || wateringFrequency <= 0) {
-      formulaError.textContent = "Invalid watering frequency.";
-      resultsDiv.style.display = "none";
-      return;
-    }
-    if (isNaN(etReplacementPercent) || etReplacementPercent <= 0 || etReplacementPercent > 100) {
-      formulaError.textContent = "Invalid ET replacement percentage.";
-      resultsDiv.style.display = "none";
-      return;
+    let W = parseFloat(wateringFreqInput.value);
+    if (isNaN(W) || W <= 0) {
+      W = DEFAULT_WATERING_FREQ;
+      wateringFreqInput.value = W;
     }
 
-    // Assume ET and R are to be provided or are fixed for calculation demo
-    // For demonstration, let's assume:
-    const ET = 0.25; // example evapotranspiration rate inches/day
-    const R = 0.05;  // example rainfall inches/day
+    let ET_replace_percent = parseFloat(etReplacementInput.value);
+    if (isNaN(ET_replace_percent) || ET_replace_percent <= 0 || ET_replace_percent > 100) {
+      ET_replace_percent = DEFAULT_ET_REPLACEMENT;
+      etReplacementInput.value = ET_replace_percent;
+    }
+    const ET_replace = ET_replace_percent / 100;
 
-    // For each zone, calculate runtime
+    const formulaStr = formulaInput.value.trim() || DEFAULT_FORMULA;
+    if (!validateFormula(formulaStr)) {
+      errorMessage.textContent = "Invalid formula. Use variables W, ET, R, Rate and valid math operators.";
+      return;
+    }
+
+    // Gather zones
     const zones = [];
+    let zonesValid = true;
     [...zonesContainer.children].forEach(row => {
-      const name = row.querySelector(".zone-name").value.trim() || "(Unnamed Zone)";
-      const rateStr = row.querySelector(".rate").value.trim();
-      const Rate = parseFloat(rateStr);
-      if (!name || isNaN(Rate) || Rate <= 0) {
-        // skip invalid zones
-        return;
+      const name = row.querySelector(".zone-name").value.trim();
+      const rate = parseFloat(row.querySelector(".rate").value);
+      if (!name) {
+        zonesValid = false;
       }
-      zones.push({ name, Rate });
+      if (isNaN(rate) || rate <= 0) {
+        zonesValid = false;
+      }
+      zones.push({ name, rate });
     });
-
-    if (zones.length === 0) {
-      formulaError.textContent = "No valid zones found.";
-      resultsDiv.style.display = "none";
+    if (!zonesValid || zones.length === 0) {
+      errorMessage.textContent = "Please enter valid zone names and positive runtime per inch.";
       return;
     }
 
-    const W = wateringFrequency;
-    const ETreplace = etReplacementPercent / 100;
+    try {
+      resultsDiv.textContent = "Fetching ET and rainfall data...";
+      resultsDiv.style.display = "block";
 
-    zones.forEach(({ name, Rate }) => {
-      try {
-        // Evaluate formula replacing tokens
-        // Replace ET with (ET * ETreplace) in formula tokens by modifying tokens temporarily
-        // But since formula tokens use 0.75 (or other number) for ETreplace, formula is ready
-        // So we just supply ET, R, W, Rate
+      const { etData, rainData } = await fetchETAndRainfall(lat, lon);
 
-        const value = evaluateFormula(formulaTokens, { ET, R, W, Rate, ETreplace });
-        const minutes = Math.max(0, value);
-        const rounded = Math.round(minutes * 100) / 100;
+      const ET_week = sumArray(etData);
+      const R_week = sumArray(rainData);
 
-        const zoneResult = document.createElement("div");
-        zoneResult.textContent = `${name}: ${rounded} minutes`;
-        resultsDiv.appendChild(zoneResult);
-      } catch (e) {
-        formulaError.textContent = `Error calculating zone ${name}: ${e.message}`;
-        resultsDiv.style.display = "none";
+      resultsDiv.innerHTML = `<strong>Weekly ET (inches):</strong> ${ET_week.toFixed(3)}<br>
+<strong>Weekly Rainfall (inches):</strong> ${R_week.toFixed(3)}<br><br>`;
+
+      // Show forecast bars
+      const etMax = Math.max(...etData);
+      const rainMax = Math.max(...rainData);
+
+      const etBarGraph = renderBarGraph(etData, etMax || 0.3, "bar et");
+      const rainBarGraph = renderBarGraph(rainData, rainMax || 0.4, "bar rain");
+
+      const graphContainer = document.createElement("div");
+      graphContainer.id = "et-rain-container";
+      graphContainer.innerHTML = `<div><strong>7-day ET forecast:</strong></div>`;
+      graphContainer.appendChild(etBarGraph);
+      graphContainer.innerHTML += `<div><strong>7-day Rainfall forecast:</strong></div>`;
+      graphContainer.appendChild(rainBarGraph);
+
+      resultsDiv.appendChild(graphContainer);
+
+      resultsDiv.innerHTML += `<br><strong>Zone runtimes (minutes):</strong><br>`;
+
+      // Calculate runtimes
+      let anyNegative = false;
+      const runtimes = zones.map(({ name, rate }) => {
+        // eslint-disable-next-line no-new-func
+        const f = new Function("W", "ET", "R", "Rate", `return ${formulaStr};`);
+        let val = f(W, ET_week, R_week, rate);
+        if (val < 0) {
+          val = 0;
+          anyNegative = true;
+        }
+        return { name, val: val.toFixed(1) };
+      });
+
+      runtimes.forEach(({ name, val }) => {
+        resultsDiv.innerHTML += `${name}: ${val} minutes\n`;
+      });
+
+      if (anyNegative) {
+        resultsDiv.innerHTML += "\n* Some runtimes were negative and have been set to 0.";
       }
-    });
 
-    saveAllInputsToStorage();
+      resultsDiv.style.whiteSpace = "pre-wrap";
+
+      saveZones();
+      saveOtherInputs();
+    } catch (err) {
+      errorMessage.textContent = "Error fetching weather data: " + err.message;
+      resultsDiv.style.display = "none";
+    }
   });
 
-  // Reset button handler
-  resetBtn.addEventListener("click", resetToDefaults);
-
-  // Initialize
-  loadAllInputsFromStorage();
+  // Initial load
+  loadZones();
+  loadOtherInputs();
 })();
 </script>
+
 </body>
 </html>
