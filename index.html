@@ -589,8 +589,9 @@
       // Calculate runtimes
       let anyNegative = false;
       const runtimes = zones.map(({ name, rate }) => {
+        const formulaWithDailyW = formulaStr.replace(/\bW\b/g, `(W/7)`);
         // eslint-disable-next-line no-new-func
-        const f = new Function("W", "ET", "R", "Rate", `return ${formulaStr};`);
+        const f = new Function("W", "ET", "R", "Rate", `return ${formulaWithDailyW};`);
         let val = f(W, ET_week, R_week, rate);
         if (val < 0) {
           val = 0;
@@ -625,3 +626,4 @@
 
 </body>
 </html>
+
