@@ -36,39 +36,26 @@
 <div id="results"></div>
 
 <script>
-  async function fetchWeeklyET(lat, lon) {
-    const today = new Date().toISOString().slice(0,10);
-    const endDate = new Date(Date.now() + 7*24*60*60*1000).toISOString().slice(0,10);
-    const url = `https://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?whichClient=timeseries&lat=${lat}&lon=${lon}&product=time-series&startTime=${today}T00:00:00&endTime=${endDate}T00:00:00&Unit=e&weatherParameters=evp168`;
-    try {
-      const response = await fetch(url);
-      const text = await response.text();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(text, "application/xml");
-      const evapNode = xmlDoc.querySelector('evapotranspiration[type="weekly"]');
-      if (evapNode) {
-        return parseFloat(evapNode.querySelector('value').textContent);
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }
+  // Location coordinates
+  const LATITUDE = 47.94;
+  const LONGITUDE = -122.21;
 
-  async function fetch7DayRainfall(lat, lon) {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=auto&start=${new Date().toISOString().slice(0,10)}&end=${new Date(Date.now() + 6*24*60*60*1000).toISOString().slice(0,10)}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      return data.daily.precipitation_sum.reduce((a,b) => a + b, 0);
-    } catch {
-      return null;
-    }
+  // Sprinkler zones configuration (name and minutes per inch)
+  const sprinklers = [
+    { name: "Front Yard", ratePerInch: 240 },
+    { name: "Upper Backyard", ratePerInch: 320 },
+    { name: "Bottom Backyard", ratePerInch: 120 }
+  ];
+
+  // Constants
+  const wateringFrequency = 2 / 7;  // watering every 2 days
+  const etReplacement = 0.75;       // 75% ET replacement
+
+  function sumArray(arr) {
+    return arr.reduce((a, b) => a + b, 0);
   }
 
   function calculateRuntime(ratePerInch, ET, R) {
-    const wateringFrequency = 2/7;  // watering every 2 days
-    const etReplacement = 0.75;     // 75% ET replacement
     let adjustedInches = wateringFrequency * (etReplacement * ET - R);
     if (adjustedInches <= 0) return 0;
     return adjustedInches * ratePerInch;
@@ -76,48 +63,61 @@
 
   function formatMinutes(mins) {
     if (mins <= 0) return "0 min";
-    const hours = Math.floor(mins / 60);
-    const minutes = Math.round(mins % 60);
-    return hours > 0 ? `${hours} hr ${minutes} min` : `${minutes} min`;
+    let hrs = Math.floor(mins / 60);
+    let minutes = Math.round(mins % 60);
+    return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
   }
 
-  document.getElementById('calculateBtn').onclick = async () => {
-    const lat = parseFloat(document.getElementById('latitude').value);
-    const lon = parseFloat(document.getElementById('longitude').value);
-    const sprinklerInput = document.getElementById('sprinklers').value;
-    if (isNaN(lat) || isNaN(lon)) {
-      alert('Please enter valid latitude and longitude.');
-      return;
+  async function fetchWeatherData() {
+    const today = new Date();
+    const startDate = today.toISOString().slice(0, 10);
+    const endDateObj = new Date();
+    endDateObj.setDate(today.getDate() + 6);
+    const endDate = endDateObj.toISOString().slice(0, 10);
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE}&longitude=${LONGITUDE}` +
+      `&daily=precipitation_sum,et0_fao_evapotranspiration&timezone=America/Los_Angeles` +
+      `&start_date=${startDate}&end_date=${endDate}`;
+
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error("Failed to fetch weather data");
+    return resp.json();
+  }
+
+  async function calculateSprinklerTimes() {
+    const output = document.getElementById("output");
+    output.textContent = "Fetching weather data...";
+
+    try {
+      const data = await fetchWeatherData();
+
+      if (!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
+        output.textContent = "Incomplete weather data received.";
+        return;
+      }
+
+      const weeklyRainfall = sumArray(data.daily.precipitation_sum);
+      const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
+
+      const resultLines = sprinklers.map(({ name, ratePerInch }) => {
+        const runtime = calculateRuntime(ratePerInch, weeklyET, weeklyRainfall);
+        return `${name}: ${formatMinutes(runtime)}`;
+      });
+
+      output.textContent =
+        `Weekly ET: ${weeklyET.toFixed(2)} inches\n` +
+        `Predicted 7-Day Rainfall: ${weeklyRainfall.toFixed(2)} inches\n\n` +
+        `Sprinkler Timing (every 2 days):\n` +
+        resultLines.join("\n");
+
+    } catch (error) {
+      output.textContent = `Error: ${error.message}`;
     }
-    const sprinklers = sprinklerInput.split(',').map(item => {
-      const [name, rate] = item.split(':');
-      return { name: name.trim(), rate: parseFloat(rate.trim()) };
-    });
+  }
 
-    const ET = await fetchWeeklyET(lat, lon);
-    if (ET === null) {
-      alert('Failed to fetch weekly ET data.');
-      return;
-    }
-
-    const rainfall = await fetch7DayRainfall(lat, lon);
-    if (rainfall === null) {
-      alert('Failed to fetch rainfall data.');
-      return;
-    }
-
-    let output = `Weekly ET: ${ET.toFixed(2)} inches\n`;
-    output += `7-day Rainfall: ${rainfall.toFixed(2)} inches\n\n`;
-    output += `Sprinkler Runtimes (for watering every 2 days, 75% ET replacement):\n`;
-
-    sprinklers.forEach(s => {
-      const runtime = calculateRuntime(s.rate, ET, rainfall);
-      output += `${s.name}: ${formatMinutes(runtime)}\n`;
-    });
-
-    document.getElementById('results').textContent = output;
-  };
+  document.getElementById("calculate").addEventListener("click", calculateSprinklerTimes);
 </script>
 
 </body>
 </html>
+
