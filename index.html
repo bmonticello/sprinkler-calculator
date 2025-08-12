@@ -376,7 +376,7 @@
       resultsDiv.innerHTML =
         `<strong>Weekly ET (evapotranspiration):</strong> ${weeklyET.toFixed(3)} inches<br>` +
         `<strong>Predicted 7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} inches<br><br>` +
-        `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>` +
+        `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% weekly ET replacement):</strong><br>` +
         resultLines.join("<br>");
     } catch (error) {
       if (!resultsDiv.textContent.includes("Formula evaluation failed")) {
