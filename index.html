@@ -65,8 +65,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const endDate = endDateObj.toISOString().slice(0, 10);
 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-      `&daily=precipitation_sum,et0_fao_evapotranspiration&timezone=America/Los_Angeles` +
-      `&start_date=${startDate}&end_date=${endDate}`;
+      `&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
 
     const resp = await fetch(url);
     if (!resp.ok) throw new Error("Failed to fetch weather data");
@@ -119,3 +118,4 @@ window.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
