@@ -36,6 +36,7 @@
 <div id="results"></div>
 
 <script>
+window.addEventListener("DOMContentLoaded", () => {
   const wateringFrequency = 2 / 7;  // watering every 2 days
   const etReplacement = 0.75;       // 75% ET replacement
 
@@ -113,6 +114,7 @@
   }
 
   document.getElementById("calculateBtn").addEventListener("click", calculateSprinklerTimes);
+});
 </script>
 
 </body>
