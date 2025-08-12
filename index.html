@@ -7,52 +7,42 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    margin: 1.5rem;
+    margin: 2rem;
     max-width: 600px;
-    padding: 0 1rem;
+    background: #f0f4f8;
+    color: #222;
   }
   h1 {
     text-align: center;
     margin-bottom: 0.2rem;
   }
-  #description {
+  p.description {
     font-size: 0.9rem;
-    color: #444;
-    margin-bottom: 1rem;
+    color: #555;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
   }
   label {
     display: block;
     margin-top: 1rem;
-    font-weight: 600;
+    font-weight: bold;
   }
   input[type="number"], input[type="text"] {
     padding: 0.5rem;
     font-size: 1rem;
+    width: 100%;
     margin-top: 0.3rem;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
+    border: 1px solid #bbb;
     border-radius: 4px;
+    box-sizing: border-box;
   }
-  button {
+  #sprinklerZones {
     margin-top: 1rem;
-    padding: 0.7rem 1rem;
-    font-size: 1.1rem;
-    background-color: #2a8;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    max-width: 320px;
-    display: block;
-  }
-  button:hover {
-    background-color: #196;
-  }
-  #zones-container {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 6px;
   }
   .zone-row {
     display: flex;
@@ -65,98 +55,64 @@
   .zone-row input.zone-name {
     flex: 2;
   }
-  .zone-row button.remove-zone-btn {
-    flex: 0 0 32px;
-    background: #e44;
-    border-radius: 4px;
-    font-weight: bold;
-  }
-  .zone-row button.remove-zone-btn:hover {
-    background: #c22;
-  }
-  #zones-labels {
-    display: flex;
-    gap: 0.5rem;
-    font-weight: 600;
+  button {
     margin-top: 1rem;
+    padding: 0.7rem;
+    font-size: 1.1rem;
+    width: 100%;
+    background-color: #007acc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
   }
-  #zones-labels div {
-    flex: 1;
-    text-align: left;
+  button:hover {
+    background-color: #005fa3;
   }
-  #zones-labels div.zone-name-label {
-    flex: 2;
+  button:disabled {
+    background-color: #999;
+    cursor: not-allowed;
   }
   #results {
-    margin-top: 1.5rem;
-    background: #f4f9f4;
+    margin-top: 2rem;
+    background: white;
     padding: 1rem;
     border-radius: 6px;
-    white-space: pre-wrap;
-    font-family: monospace;
-    color: #222;
-    display: none;
+    white-space: pre-line;
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.1);
   }
-  #error-message {
-    color: #c22;
-    margin-top: 1rem;
-    font-weight: 700;
+  #addZoneBtn {
+    background-color: #28a745;
+    margin-top: 0.5rem;
   }
-  #location-buttons {
+  #addZoneBtn:hover {
+    background-color: #1e7e34;
+  }
+  #locationBtn {
+    margin-top: 0.5rem;
+    background-color: #6c757d;
+  }
+  #locationBtn:hover {
+    background-color: #5a6268;
+  }
+  .labels-row {
     display: flex;
-    gap: 1rem;
-    margin-top: 0.3rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-weight: bold;
   }
-  #location-buttons button {
+  .labels-row > div {
     flex: 1;
-    max-width: 140px;
-    background: #4287f5;
   }
-  #location-buttons button:hover {
-    background: #256edc;
-  }
-  .bar-container {
-    display: flex;
-    gap: 2px;
-    height: 16px;
-    margin-top: 4px;
-  }
-  .bar {
-    background-color: #2a8;
-    height: 100%;
-    border-radius: 2px;
-  }
-  .bar.rain {
-    background-color: #1e90ff;
-  }
-  .bar.et {
-    background-color: #2a8;
-  }
-  #et-rain-container {
-    margin-top: 1rem;
-  }
-  #et-rain-container div {
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
+  .labels-row > div.zone-name {
+    flex: 2;
   }
   @media (max-width: 480px) {
     .zone-row {
       flex-direction: column;
     }
-    .zone-row input, .zone-row button.remove-zone-btn {
-      flex: 1 1 auto;
-      width: 100%;
-    }
-    #zones-labels {
+    .labels-row {
       flex-direction: column;
-    }
-    #zones-labels div {
-      text-align: left;
-      flex: none;
-    }
-    button {
-      max-width: 100%;
     }
   }
 </style>
@@ -164,466 +120,184 @@
 <body>
 
 <h1>Sprinkler Runtime Calculator</h1>
-<div id="description">
-  This calculator helps you determine how long to run each sprinkler zone based on location, watering frequency, and evapotranspiration data.<br><br>
-  Formula used:<br>
-  <code>Runtime (minutes) = W × (ET × ET_replace - R) × Rate</code><br>
-  where:<br>
-  &nbsp;&nbsp;W = watering frequency (days between watering)<br>
-  &nbsp;&nbsp;ET = weekly evapotranspiration (inches)<br>
-  &nbsp;&nbsp;ET_replace = ET replacement percentage (as decimal)<br>
-  &nbsp;&nbsp;R = weekly rainfall (inches)<br>
-  &nbsp;&nbsp;Rate = minutes of runtime per inch for the zone<br><br>
-  You can customize the formula below if desired using variables: <code>ET</code>, <code>R</code>, <code>W</code>, <code>Rate</code>.
-</div>
+<p class="description">
+  Calculate the runtime for each sprinkler zone based on weather forecast data.<br/>
+  <br/>
+  Formula used (W = watering frequency in days, ET = weekly evapotranspiration, R = weekly rainfall, Rate = minutes per 1" water):<br/>
+  <code>Runtime = (W / 7) × (ET × ET Replacement % - R) × Rate</code><br/>
+  You can customize watering frequency and ET replacement below.<br/>
+</p>
 
 <label>
   Latitude:
-  <input type="number" id="latitude" placeholder="Enter latitude (e.g. 47.94)" step="0.0001" />
+  <input type="number" id="latitude" placeholder="Enter latitude (e.g., 47.94)" step="0.0001" />
 </label>
 
 <label>
   Longitude:
-  <input type="number" id="longitude" placeholder="Enter longitude (e.g. -122.21)" step="0.0001" />
+  <input type="number" id="longitude" placeholder="Enter longitude (e.g., -122.21)" step="0.0001" />
 </label>
 
-<div id="location-buttons">
-  <button id="use-location-btn" type="button">Use My Location</button>
-  <button id="clear-location-btn" type="button" style="background:#e44;">Clear Location</button>
-</div>
+<button id="locationBtn" type="button">Use My Current Location</button>
 
 <label>
-  Watering Frequency (days between watering):
-  <input type="number" id="watering-frequency" placeholder="Default: 2 days" min="0.1" step="0.1" />
+  Watering Frequency (every X days):
+  <input type="number" id="wateringFrequency" placeholder="e.g., 2 (water every 2 days)" min="1" />
 </label>
 
 <label>
   ET Replacement Percentage (%):
-  <input type="number" id="et-replacement" placeholder="Default: 75%" min="1" max="100" step="1" />
+  <input type="number" id="etReplacement" placeholder="e.g., 75 for 75%" min="0" max="100" />
 </label>
 
-<label>
-  Sprinkler Zones:
-</label>
-
-<div id="zones-labels">
-  <div class="zone-name-label">Zone Name</div>
-  <div>Runtime per Inch (minutes)</div>
-  <div style="width:32px;"></div>
+<div id="sprinklerZones">
+  <div class="labels-row">
+    <div class="zone-name">Sprinkler Zone Name</div>
+    <div>Runtime per 1" (minutes)</div>
+    <div style="width: 24px;"></div>
+  </div>
+  <!-- Zones will be appended here -->
 </div>
+<button id="addZoneBtn" type="button">+ Add Sprinkler Zone</button>
 
-<div id="zones-container"></div>
+<button id="calculateBtn" type="button">Calculate Runtime</button>
 
-<button id="add-zone-btn" type="button">Add Zone</button>
-
-<label style="margin-top:1.5rem;">
-  Runtime Formula:
-  <input type="text" id="formula-input" placeholder="Example: W * (ET * 0.75 - R) * Rate" />
-</label>
-
-<div id="error-message" role="alert" aria-live="assertive"></div>
-
-<button id="calculate-btn" type="button">Calculate Runtime</button>
-
-<button id="reset-btn" type="button" style="background:#c44; margin-top:1rem;">Reset to Defaults</button>
-
-<div id="results" aria-live="polite" aria-atomic="true"></div>
+<div id="results" style="display:none;"></div>
 
 <script>
-(() => {
-  const STORAGE_KEYS = {
-    zones: "sprinkler_zones",
-    lat: "sprinkler_latitude",
-    lon: "sprinkler_longitude",
-    wateringFrequency: "sprinkler_watering_frequency",
-    etReplacement: "sprinkler_et_replacement",
-    formula: "sprinkler_formula"
-  };
-
-  const DEFAULT_WATERING_FREQ = 2;
-  const DEFAULT_ET_REPLACEMENT = 75;
-  const DEFAULT_FORMULA = "W * (ET * 0.75 - R) * Rate";
-
-  const zonesContainer = document.getElementById("zones-container");
-  const addZoneBtn = document.getElementById("add-zone-btn");
-  const calculateBtn = document.getElementById("calculate-btn");
-  const resetBtn = document.getElementById("reset-btn");
+  const zonesContainer = document.getElementById("sprinklerZones");
   const resultsDiv = document.getElementById("results");
-  const errorMessage = document.getElementById("error-message");
 
-  const latInput = document.getElementById("latitude");
-  const lonInput = document.getElementById("longitude");
-  const wateringFreqInput = document.getElementById("watering-frequency");
-  const etReplacementInput = document.getElementById("et-replacement");
-  const formulaInput = document.getElementById("formula-input");
-
-  const useLocationBtn = document.getElementById("use-location-btn");
-  const clearLocationBtn = document.getElementById("clear-location-btn");
-
-  // --- Utility functions ---
-
-  function saveZones() {
-    const zones = [];
-    [...zonesContainer.children].forEach(row => {
-      const name = row.querySelector(".zone-name").value.trim();
-      const rate = row.querySelector(".rate").value.trim();
-      if (name && rate && !isNaN(rate) && Number(rate) > 0) {
-        zones.push({ name, rate: Number(rate) });
-      }
-    });
-    localStorage.setItem(STORAGE_KEYS.zones, JSON.stringify(zones));
-  }
-
-  function loadZones() {
-    zonesContainer.innerHTML = "";
-    const stored = localStorage.getItem(STORAGE_KEYS.zones);
-    if (stored) {
-      try {
-        const zones = JSON.parse(stored);
-        if (Array.isArray(zones) && zones.length) {
-          zones.forEach(({ name, rate }) => addZone(name, rate));
-          return;
-        }
-      } catch {}
-    }
-    addZone();
-  }
-
+  // Add a sprinkler zone input row
   function addZone(name = "", rate = "") {
-    const row = document.createElement("div");
-    row.className = "zone-row";
-
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.className = "zone-name";
-    nameInput.placeholder = "Zone Name";
-    nameInput.value = name;
-    nameInput.setAttribute("aria-label", "Zone name");
-
-    const rateInput = document.createElement("input");
-    rateInput.type = "number";
-    rateInput.className = "rate";
-    rateInput.placeholder = "Minutes per inch";
-    rateInput.min = "0.01";
-    rateInput.step = "0.01";
-    rateInput.value = rate;
-    rateInput.setAttribute("aria-label", "Runtime per inch");
-
-    const removeBtn = document.createElement("button");
-    removeBtn.type = "button";
-    removeBtn.className = "remove-zone-btn";
-    removeBtn.textContent = "×";
-    removeBtn.setAttribute("aria-label", "Remove zone");
-    removeBtn.addEventListener("click", () => {
-      zonesContainer.removeChild(row);
-      saveZones();
-    });
-
-    nameInput.addEventListener("input", saveZones);
-    rateInput.addEventListener("input", saveZones);
-
-    row.appendChild(nameInput);
-    row.appendChild(rateInput);
-    row.appendChild(removeBtn);
-
-    zonesContainer.appendChild(row);
+    const div = document.createElement("div");
+    div.classList.add("zone-row");
+    div.innerHTML = `
+      <input type="text" class="zone-name" placeholder="Zone name" value="${name}" />
+      <input type="number" min="0" placeholder="Minutes per 1 inch" value="${rate}" />
+      <button type="button" title="Remove zone" aria-label="Remove zone">×</button>
+    `;
+    const btn = div.querySelector("button");
+    btn.onclick = () => div.remove();
+    zonesContainer.appendChild(div);
   }
 
-  addZoneBtn.addEventListener("click", () => {
-    addZone();
-  });
+  document.getElementById("addZoneBtn").addEventListener("click", () => addZone());
 
-  // Save inputs other than zones
-  function saveOtherInputs() {
-    if (latInput.value) localStorage.setItem(STORAGE_KEYS.lat, latInput.value);
-    else localStorage.removeItem(STORAGE_KEYS.lat);
+  // On page load, start with one empty zone
+  addZone();
 
-    if (lonInput.value) localStorage.setItem(STORAGE_KEYS.lon, lonInput.value);
-    else localStorage.removeItem(STORAGE_KEYS.lon);
-
-    if (wateringFreqInput.value) localStorage.setItem(STORAGE_KEYS.wateringFrequency, wateringFreqInput.value);
-    else localStorage.removeItem(STORAGE_KEYS.wateringFrequency);
-
-    if (etReplacementInput.value) localStorage.setItem(STORAGE_KEYS.etReplacement, etReplacementInput.value);
-    else localStorage.removeItem(STORAGE_KEYS.etReplacement);
-
-    if (formulaInput.value) localStorage.setItem(STORAGE_KEYS.formula, formulaInput.value);
-    else localStorage.removeItem(STORAGE_KEYS.formula);
-  }
-
-  latInput.addEventListener("input", saveOtherInputs);
-  lonInput.addEventListener("input", saveOtherInputs);
-  wateringFreqInput.addEventListener("input", saveOtherInputs);
-  etReplacementInput.addEventListener("input", saveOtherInputs);
-  formulaInput.addEventListener("input", saveOtherInputs);
-
-  // Load other inputs from localStorage
-  function loadOtherInputs() {
-    const lat = localStorage.getItem(STORAGE_KEYS.lat);
-    if (lat) latInput.value = lat;
-
-    const lon = localStorage.getItem(STORAGE_KEYS.lon);
-    if (lon) lonInput.value = lon;
-
-    const wf = localStorage.getItem(STORAGE_KEYS.wateringFrequency);
-    if (wf) wateringFreqInput.value = wf;
-    else wateringFreqInput.value = DEFAULT_WATERING_FREQ;
-
-    const etr = localStorage.getItem(STORAGE_KEYS.etReplacement);
-    if (etr) etReplacementInput.value = etr;
-    else etReplacementInput.value = DEFAULT_ET_REPLACEMENT;
-
-    const formula = localStorage.getItem(STORAGE_KEYS.formula);
-    if (formula) formulaInput.value = formula;
-    else formulaInput.value = DEFAULT_FORMULA;
-  }
-
-  // Clear all saved data and reset inputs and zones
-  resetBtn.addEventListener("click", () => {
-    if (!confirm("Reset all data to defaults?")) return;
-    localStorage.clear();
-    latInput.value = "";
-    lonInput.value = "";
-    wateringFreqInput.value = DEFAULT_WATERING_FREQ;
-    etReplacementInput.value = DEFAULT_ET_REPLACEMENT;
-    formulaInput.value = DEFAULT_FORMULA;
-    zonesContainer.innerHTML = "";
-    addZone();
-    resultsDiv.style.display = "none";
-    errorMessage.textContent = "";
-  });
-
-  // Use browser geolocation
-  useLocationBtn.addEventListener("click", () => {
+  // Get current location
+  document.getElementById("locationBtn").addEventListener("click", () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
       return;
     }
-    useLocationBtn.textContent = "Getting location...";
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        latInput.value = pos.coords.latitude.toFixed(5);
-        lonInput.value = pos.coords.longitude.toFixed(5);
-        saveOtherInputs();
-        useLocationBtn.textContent = "Use My Location";
+        document.getElementById("latitude").value = pos.coords.latitude.toFixed(4);
+        document.getElementById("longitude").value = pos.coords.longitude.toFixed(4);
       },
-      (err) => {
-        alert("Unable to retrieve location.");
-        useLocationBtn.textContent = "Use My Location";
-      },
-      { timeout: 10000 }
+      (err) => alert("Could not get location: " + err.message)
     );
   });
-
-  clearLocationBtn.addEventListener("click", () => {
-    latInput.value = "";
-    lonInput.value = "";
-    saveOtherInputs();
-  });
-
-  // Validate formula
-  function validateFormula(formula) {
-    // Allow only W, ET, R, Rate, numbers, operators, parens, spaces
-    // Also allow Math functions: Math.min, Math.max etc? Let's keep simple and no functions
-    // Use RegExp to check only allowed chars and words
-
-    const allowedVars = ["W", "ET", "R", "Rate"];
-    // Remove allowed vars temporarily to check
-    let checkStr = formula;
-    allowedVars.forEach(v => {
-      const re = new RegExp("\\b" + v + "\\b", "g");
-      checkStr = checkStr.replace(re, "");
-    });
-    // Remove numbers, operators, spaces, parentheses
-    checkStr = checkStr.replace(/[\d+\-*/().\s]/g, "");
-
-    if (checkStr.length > 0) {
-      return false;
-    }
-    try {
-      // Test with dummy values
-      const W = 1, ET = 1, R = 1, Rate = 1;
-      // eslint-disable-next-line no-new-func
-      const f = new Function("W", "ET", "R", "Rate", `return ${formula};`);
-      const test = f(W, ET, R, Rate);
-      if (typeof test !== "number" || isNaN(test)) return false;
-    } catch {
-      return false;
-    }
-    return true;
-  }
-
-  // Fetch ET and Rainfall data for the week
-  // For demo, simulate data with random or fixed values
-  // In real app, would call weather API by lat/lon for 7-day forecast
-  async function fetchETAndRainfall(lat, lon) {
-    // For demo, generate 7 days data for ET and Rainfall (in inches)
-    // Let's create sample realistic values:
-    // ET between 0.1 and 0.3 inches/day
-    // Rainfall between 0 and 0.4 inches/day
-
-    if (!lat || !lon) {
-      throw new Error("Latitude and Longitude required for weather data.");
-    }
-
-    // Simulate fetch delay
-    await new Promise(r => setTimeout(r, 500));
-
-    const etData = [];
-    const rainData = [];
-    for (let i = 0; i < 7; i++) {
-      // Use deterministic values based on lat/lon so output doesn't change wildly:
-      const baseET = 0.2 + (lat % 0.1) * 0.5 - (lon % 0.1) * 0.3;
-      const dailyET = +(0.15 + 0.15 * Math.sin(i + lat + lon)).toFixed(3);
-      const dailyRain = +(0.1 * Math.max(0, Math.cos(i + lon - lat))).toFixed(3);
-      etData.push(dailyET);
-      rainData.push(dailyRain);
-    }
-    return { etData, rainData };
-  }
 
   function sumArray(arr) {
     return arr.reduce((a, b) => a + b, 0);
   }
 
-  // Render bar graphs for ET and rainfall
-  function renderBarGraph(data, maxValue, barClass = "bar") {
-    const container = document.createElement("div");
-    container.className = "bar-container";
-    data.forEach(value => {
-      const bar = document.createElement("div");
-      bar.className = barClass;
-      const pct = (value / maxValue) * 100;
-      bar.style.width = pct + "%";
-      bar.title = value.toFixed(2);
-      container.appendChild(bar);
-    });
-    return container;
+  function formatMinutes(mins) {
+    if (mins <= 0) return "0 min";
+    let hrs = Math.floor(mins / 60);
+    let minutes = Math.round(mins % 60);
+    return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
   }
 
-  calculateBtn.addEventListener("click", async () => {
-    errorMessage.textContent = "";
-    resultsDiv.style.display = "none";
-    resultsDiv.innerHTML = "";
+  async function fetchWeatherData(lat, lon) {
+    const today = new Date();
+    const startDate = today.toISOString().slice(0, 10);
+    const endDateObj = new Date();
+    endDateObj.setDate(today.getDate() + 6);
+    const endDate = endDateObj.toISOString().slice(0, 10);
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+      `&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
+
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error("Failed to fetch weather data");
+    return resp.json();
+  }
+
+  document.getElementById("calculateBtn").addEventListener("click", async () => {
+    resultsDiv.style.display = "block";
+    resultsDiv.textContent = "Fetching weather data...";
+
+    const lat = parseFloat(document.getElementById("latitude").value);
+    const lon = parseFloat(document.getElementById("longitude").value);
+    const wateringFreqInput = document.getElementById("wateringFrequency").value;
+    const etReplacementInput = document.getElementById("etReplacement").value;
 
     // Validate inputs
-    const lat = parseFloat(latInput.value);
-    const lon = parseFloat(lonInput.value);
-    if (isNaN(lat) || lat < -90 || lat > 90) {
-      errorMessage.textContent = "Please enter a valid latitude between -90 and 90.";
+    if (isNaN(lat) || isNaN(lon)) {
+      resultsDiv.textContent = "Please enter valid latitude and longitude.";
       return;
     }
-    if (isNaN(lon) || lon < -180 || lon > 180) {
-      errorMessage.textContent = "Please enter a valid longitude between -180 and 180.";
+    if (!wateringFreqInput) {
+      resultsDiv.textContent = "Please enter watering frequency (every X days).";
       return;
     }
-
-    let W = parseFloat(wateringFreqInput.value);
-    if (isNaN(W) || W <= 0) {
-      W = DEFAULT_WATERING_FREQ;
-      wateringFreqInput.value = W;
-    }
-
-    let ET_replace_percent = parseFloat(etReplacementInput.value);
-    if (isNaN(ET_replace_percent) || ET_replace_percent <= 0 || ET_replace_percent > 100) {
-      ET_replace_percent = DEFAULT_ET_REPLACEMENT;
-      etReplacementInput.value = ET_replace_percent;
-    }
-    const ET_replace = ET_replace_percent / 100;
-
-    const formulaStr = formulaInput.value.trim() || DEFAULT_FORMULA;
-    if (!validateFormula(formulaStr)) {
-      errorMessage.textContent = "Invalid formula. Use variables W, ET, R, Rate and valid math operators.";
+    if (!etReplacementInput) {
+      resultsDiv.textContent = "Please enter ET replacement percentage.";
       return;
     }
 
-    // Gather zones
+    const W = parseFloat(wateringFreqInput);
+    const ETreplPercent = parseFloat(etReplacementInput) / 100;
+
+    // Read sprinkler zones
     const zones = [];
-    let zonesValid = true;
-    [...zonesContainer.children].forEach(row => {
+    const rows = zonesContainer.querySelectorAll(".zone-row");
+    for (const row of rows) {
       const name = row.querySelector(".zone-name").value.trim();
-      const rate = parseFloat(row.querySelector(".rate").value);
-      if (!name) {
-        zonesValid = false;
-      }
-      if (isNaN(rate) || rate <= 0) {
-        zonesValid = false;
+      const rateStr = row.querySelector("input[type='number']").value;
+      const rate = parseFloat(rateStr);
+      if (!name || isNaN(rate) || rate < 0) {
+        resultsDiv.textContent = "Please enter valid zone names and runtimes.";
+        return;
       }
       zones.push({ name, rate });
-    });
-    if (!zonesValid || zones.length === 0) {
-      errorMessage.textContent = "Please enter valid zone names and positive runtime per inch.";
-      return;
     }
 
     try {
-      resultsDiv.textContent = "Fetching ET and rainfall data...";
-      resultsDiv.style.display = "block";
+      const data = await fetchWeatherData(lat, lon);
 
-      const { etData, rainData } = await fetchETAndRainfall(lat, lon);
-
-      const ET_week = sumArray(etData);
-      const R_week = sumArray(rainData);
-
-      resultsDiv.innerHTML = `<strong>Weekly ET (inches):</strong> ${ET_week.toFixed(3)}<br>
-<strong>Weekly Rainfall (inches):</strong> ${R_week.toFixed(3)}<br><br>`;
-
-      // Show forecast bars
-      const etMax = Math.max(...etData);
-      const rainMax = Math.max(...rainData);
-
-      const etBarGraph = renderBarGraph(etData, etMax || 0.3, "bar et");
-      const rainBarGraph = renderBarGraph(rainData, rainMax || 0.4, "bar rain");
-
-      const graphContainer = document.createElement("div");
-      graphContainer.id = "et-rain-container";
-      graphContainer.innerHTML = `<div><strong>7-day ET forecast:</strong></div>`;
-      graphContainer.appendChild(etBarGraph);
-      graphContainer.innerHTML += `<div><strong>7-day Rainfall forecast:</strong></div>`;
-      graphContainer.appendChild(rainBarGraph);
-
-      resultsDiv.appendChild(graphContainer);
-
-      resultsDiv.innerHTML += `<br><strong>Zone runtimes (minutes):</strong><br>`;
-
-      // Calculate runtimes
-      let anyNegative = false;
-      const runtimes = zones.map(({ name, rate }) => {
-        const formulaWithDailyW = formulaStr.replace(/\bW\b/g, `(W/7)`);
-        // eslint-disable-next-line no-new-func
-        const f = new Function("W", "ET", "R", "Rate", `return ${formulaWithDailyW};`);
-        let val = f(W, ET_week, R_week, rate);
-        if (val < 0) {
-          val = 0;
-          anyNegative = true;
-        }
-        return { name, val: val.toFixed(1) };
-      });
-
-      runtimes.forEach(({ name, val }) => {
-        resultsDiv.innerHTML += `${name}: ${val} minutes\n`;
-      });
-
-      if (anyNegative) {
-        resultsDiv.innerHTML += "\n* Some runtimes were negative and have been set to 0.";
+      if (!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
+        resultsDiv.textContent = "Incomplete weather data received.";
+        return;
       }
 
-      resultsDiv.style.whiteSpace = "pre-wrap";
+      const weeklyRainfall = sumArray(data.daily.precipitation_sum);
+      const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
 
-      saveZones();
-      saveOtherInputs();
-    } catch (err) {
-      errorMessage.textContent = "Error fetching weather data: " + err.message;
-      resultsDiv.style.display = "none";
+      // Calculate runtimes
+      const resultLines = zones.map(({ name, rate }) => {
+        // Apply formula: Runtime = (W/7) * (ET * ETrepl - R) * Rate
+        let adjustedInches = (W / 7) * (weeklyET * ETreplPercent - weeklyRainfall);
+        if (adjustedInches <= 0) adjustedInches = 0;
+        const runtime = adjustedInches * rate;
+        return `${name}: ${formatMinutes(runtime)}`;
+      });
+
+      resultsDiv.innerHTML =
+        `<strong>Weekly ET (evapotranspiration):</strong> ${weeklyET.toFixed(3)} inches<br>` +
+        `<strong>Predicted 7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} inches<br><br>` +
+        `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETreplPercent * 100)}% ET replacement):</strong><br>` +
+        resultLines.join("<br>");
+    } catch (error) {
+      resultsDiv.textContent = `Error fetching weather data: ${error.message}`;
     }
   });
-
-  // Initial load
-  loadZones();
-  loadOtherInputs();
-})();
 </script>
 
 </body>
 </html>
-
