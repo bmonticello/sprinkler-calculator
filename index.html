@@ -5,46 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sprinkler Runtime Calculator</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 2rem; max-width: 600px; }
-  label { display: block; margin-top: 1rem; }
-  input, button { padding: 0.5rem; font-size: 1rem; margin-top: 0.3rem; width: 100%; }
-  #results { margin-top: 2rem; white-space: pre-line; background: #f9f9f9; padding: 1rem; border-radius: 5px; }
+  body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    margin: 2rem auto;
+    max-width: 700px;
+    background-color: #f5f7fa;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #2a6ebd;
+  }
+  .card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+  }
+  input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  .zones {
+    margin-top: 1rem;
+  }
+  .zone-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+  }
+  .zone-row input {
+    flex: 1;
+  }
+  button {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #addZone {
+    background-color: #e5e7eb;
+    color: #333;
+  }
+  #calculateBtn {
+    background-color: #2a6ebd;
+    color: white;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  #results {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: pre-line;
+  }
 </style>
 </head>
 <body>
 
 <h1>Sprinkler Runtime Calculator</h1>
 
-<label>
-  Latitude:
+<div class="card">
+  <label>Latitude:</label>
   <input type="number" id="latitude" value="47.94" step="0.0001" />
-</label>
 
-<label>
-  Longitude:
+  <label>Longitude:</label>
   <input type="number" id="longitude" value="-122.21" step="0.0001" />
-</label>
 
-<label>
-  Enter sprinklers and runtimes (minutes per 1" water), comma-separated:<br/>
-  Example: Front Yard:240,Upper Backyard:320,Bottom Backyard:120
-  <input type="text" id="sprinklers" value="Front Yard:240,Upper Backyard:320,Bottom Backyard:120" />
-</label>
+  <label>Watering Frequency (days between watering):</label>
+  <input type="number" id="wateringDays" value="2" step="1" min="1" />
 
-<button id="calculateBtn">Calculate Runtime</button>
+  <label>ET Replacement (%):</label>
+  <input type="number" id="etReplacement" value="75" step="1" min="0" max="100" />
+
+  <div class="zones">
+    <label>Sprinkler Zones:</label>
+    <div id="zoneContainer"></div>
+    <button id="addZone">+ Add Zone</button>
+  </div>
+
+  <button id="calculateBtn">Calculate Runtime</button>
+</div>
 
 <div id="results"></div>
 
 <script>
 window.addEventListener("DOMContentLoaded", () => {
-  const wateringFrequency = 2 / 7;  // watering every 2 days
-  const etReplacement = 0.75;       // 75% ET replacement
+  const zoneContainer = document.getElementById("zoneContainer");
+
+  function addZone(name = "", rate = "") {
+    const row = document.createElement("div");
+    row.className = "zone-row";
+    row.innerHTML = `
+      <input type="text" placeholder="Zone Name" value="${name}" />
+      <input type="number" placeholder="Minutes for 1&quot; water" step="1" value="${rate}" />
+      <button type="button" style="background:#ff4d4f;color:white;border:none;padding:0.4rem 0.6rem;border-radius:6px;">✕</button>
+    `;
+    row.querySelector("button").addEventListener("click", () => row.remove());
+    zoneContainer.appendChild(row);
+  }
+
+  // Add a few default zones
+  addZone("Front Yard", 240);
+  addZone("Upper Backyard", 320);
+  addZone("Bottom Backyard", 120);
+
+  document.getElementById("addZone").addEventListener("click", () => addZone());
 
   function sumArray(arr) {
     return arr.reduce((a, b) => a + b, 0);
   }
 
-  function calculateRuntime(ratePerInch, ET, R) {
+  function calculateRuntime(ratePerInch, ET, R, wateringDays, etReplacement) {
+    let wateringFrequency = 1 / wateringDays;
     let adjustedInches = wateringFrequency * (etReplacement * ET - R);
     if (adjustedInches <= 0) return 0;
     return adjustedInches * ratePerInch;
@@ -58,12 +144,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   async function fetchWeatherData(lat, lon) {
-    const today = new Date();
-    const startDate = today.toISOString().slice(0, 10);
-    const endDateObj = new Date();
-    endDateObj.setDate(today.getDate() + 6);
-    const endDate = endDateObj.toISOString().slice(0, 10);
-
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
       `&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
 
@@ -78,12 +158,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const lat = parseFloat(document.getElementById("latitude").value);
     const lon = parseFloat(document.getElementById("longitude").value);
+    const wateringDays = parseFloat(document.getElementById("wateringDays").value);
+    const etReplacement = parseFloat(document.getElementById("etReplacement").value) / 100;
 
-    const sprinklerInput = document.getElementById("sprinklers").value;
-    const sprinklers = sprinklerInput.split(",").map(item => {
-      const [name, rate] = item.split(":");
-      return { name: name.trim(), ratePerInch: parseFloat(rate.trim()) };
-    });
+    const zones = Array.from(zoneContainer.querySelectorAll(".zone-row")).map(row => {
+      const inputs = row.querySelectorAll("input");
+      return { name: inputs[0].value.trim(), ratePerInch: parseFloat(inputs[1].value) };
+    }).filter(z => z.name && !isNaN(z.ratePerInch));
 
     try {
       const data = await fetchWeatherData(lat, lon);
@@ -96,15 +177,17 @@ window.addEventListener("DOMContentLoaded", () => {
       const weeklyRainfall = sumArray(data.daily.precipitation_sum);
       const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
 
-      const resultLines = sprinklers.map(({ name, ratePerInch }) => {
-        const runtime = calculateRuntime(ratePerInch, weeklyET, weeklyRainfall);
+      const resultLines = zones.map(({ name, ratePerInch }) => {
+        const runtime = calculateRuntime(ratePerInch, weeklyET, weeklyRainfall, wateringDays, etReplacement);
         return `${name}: ${formatMinutes(runtime)}`;
       });
 
       output.textContent =
         `Weekly ET: ${weeklyET.toFixed(2)} inches\n` +
-        `Predicted 7-Day Rainfall: ${weeklyRainfall.toFixed(2)} inches\n\n` +
-        `Sprinkler Timing (every 2 days):\n` +
+        `Predicted 7-Day Rainfall: ${weeklyRainfall.toFixed(2)} inches\n` +
+        `Watering every ${wateringDays} days\n` +
+        `ET Replacement: ${(etReplacement * 100).toFixed(0)}%\n\n` +
+        `Sprinkler Timing:\n` +
         resultLines.join("\n");
 
     } catch (error) {
@@ -118,4 +201,3 @@ window.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
