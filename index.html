@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sprinkler Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 2rem; max-width: 600px; }
+  label { display: block; margin-top: 1rem; }
+  input, button { padding: 0.5rem; font-size: 1rem; margin-top: 0.3rem; width: 100%; }
+  #results { margin-top: 2rem; white-space: pre-line; background: #f9f9f9; padding: 1rem; border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<h1>Sprinkler Runtime Calculator</h1>
+
+<label>
+  Latitude:
+  <input type="number" id="latitude" value="47.94" step="0.0001" />
+</label>
+
+<label>
+  Longitude:
+  <input type="number" id="longitude" value="-122.21" step="0.0001" />
+</label>
+
+<label>
+  Enter sprinklers and runtimes (minutes per 1" water), comma-separated:<br/>
+  Example: Front Yard:240,Upper Backyard:320,Bottom Backyard:120
+  <input type="text" id="sprinklers" value="Front Yard:240,Upper Backyard:320,Bottom Backyard:120" />
+</label>
+
+<button id="calculateBtn">Calculate Runtime</button>
+
+<div id="results"></div>
+
+<script>
+  async function fetchWeeklyET(lat, lon) {
+    const today = new Date().toISOString().slice(0,10);
+    const endDate = new Date(Date.now() + 7*24*60*60*1000).toISOString().slice(0,10);
+    const url = `https://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?whichClient=timeseries&lat=${lat}&lon=${lon}&product=time-series&startTime=${today}T00:00:00&endTime=${endDate}T00:00:00&Unit=e&weatherParameters=evp168`;
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(text, "application/xml");
+      const evapNode = xmlDoc.querySelector('evapotranspiration[type="weekly"]');
+      if (evapNode) {
+        return parseFloat(evapNode.querySelector('value').textContent);
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function fetch7DayRainfall(lat, lon) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=auto&start=${new Date().toISOString().slice(0,10)}&end=${new Date(Date.now() + 6*24*60*60*1000).toISOString().slice(0,10)}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.daily.precipitation_sum.reduce((a,b) => a + b, 0);
+    } catch {
+      return null;
+    }
+  }
+
+  function calculateRuntime(ratePerInch, ET, R) {
+    const wateringFrequency = 2/7;  // watering every 2 days
+    const etReplacement = 0.75;     // 75% ET replacement
+    let adjustedInches = wateringFrequency * (etReplacement * ET - R);
+    if (adjustedInches <= 0) return 0;
+    return adjustedInches * ratePerInch;
+  }
+
+  function formatMinutes(mins) {
+    if (mins <= 0) return "0 min";
+    const hours = Math.floor(mins / 60);
+    const minutes = Math.round(mins % 60);
+    return hours > 0 ? `${hours} hr ${minutes} min` : `${minutes} min`;
+  }
+
+  document.getElementById('calculateBtn').onclick = async () => {
+    const lat = parseFloat(document.getElementById('latitude').value);
+    const lon = parseFloat(document.getElementById('longitude').value);
+    const sprinklerInput = document.getElementById('sprinklers').value;
+    if (isNaN(lat) || isNaN(lon)) {
+      alert('Please enter valid latitude and longitude.');
+      return;
+    }
+    const sprinklers = sprinklerInput.split(',').map(item => {
+      const [name, rate] = item.split(':');
+      return { name: name.trim(), rate: parseFloat(rate.trim()) };
+    });
+
+    const ET = await fetchWeeklyET(lat, lon);
+    if (ET === null) {
+      alert('Failed to fetch weekly ET data.');
+      return;
+    }
+
+    const rainfall = await fetch7DayRainfall(lat, lon);
+    if (rainfall === null) {
+      alert('Failed to fetch rainfall data.');
+      return;
+    }
+
+    let output = `Weekly ET: ${ET.toFixed(2)} inches\n`;
+    output += `7-day Rainfall: ${rainfall.toFixed(2)} inches\n\n`;
+    output += `Sprinkler Runtimes (for watering every 2 days, 75% ET replacement):\n`;
+
+    sprinklers.forEach(s => {
+      const runtime = calculateRuntime(s.rate, ET, rainfall);
+      output += `${s.name}: ${formatMinutes(runtime)}\n`;
+    });
+
+    document.getElementById('results').textContent = output;
+  };
+</script>
+
+</body>
+</html>
