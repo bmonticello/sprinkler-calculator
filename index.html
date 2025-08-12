@@ -7,381 +7,419 @@
 <style>
   body {
     font-family: Arial, sans-serif;
+    margin: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
     background: #f0f4f8;
     color: #222;
-    margin: 0;
-    padding: 2rem;
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  #container {
-    max-width: 600px;
-    width: 100%;
-    background: white;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 0 15px rgb(0 0 0 / 0.1);
-    box-sizing: border-box;
   }
   h1 {
     text-align: center;
-    margin-bottom: 0.2rem;
   }
-  p.description {
-    font-size: 0.9rem;
-    color: #555;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    line-height: 1.4;
+  #description {
+    max-width: 600px;
+    margin: 0 auto 1.5rem auto;
+    font-size: 1rem;
+    color: #444;
+    text-align: center;
   }
   label {
     display: block;
     margin-top: 1rem;
-    font-weight: bold;
   }
-  input[type="number"], input[type="text"] {
-    padding: 0.6rem;
+  input, button {
+    padding: 0.5rem;
     font-size: 1rem;
-    width: 100%;
     margin-top: 0.3rem;
-    border: 1px solid #bbb;
-    border-radius: 6px;
+    width: 100%;
     box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
   }
-  #sprinklerZones {
+  input:focus {
+    border-color: #4a90e2;
+    outline: none;
+  }
+  #zones-container {
     margin-top: 1rem;
-    background: #f9fafb;
-    border: 1px solid #ddd;
-    padding: 1rem;
-    border-radius: 8px;
   }
   .zone-row {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
-  .zone-row input {
-    padding: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
   }
   .zone-row input.zone-name {
     flex: 2;
   }
   .zone-row input.zone-rate {
-    flex: 1;
+    flex: 1.5;
+    min-width: 80px;
   }
   .zone-row button {
     background: #dc3545;
     color: white;
     border: none;
     border-radius: 6px;
-    width: 32px;
-    font-size: 1.3rem;
+    width: 40px;
+    height: 36px;
+    font-size: 1.6rem;
     line-height: 1;
     cursor: pointer;
     flex-shrink: 0;
+    padding: 0;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   .zone-row button:hover {
     background: #b02a37;
+    box-shadow: 0 0 8px rgba(176, 42, 55, 0.7);
   }
-  button {
+  .input-labels {
+    display: flex;
+    gap: 0.5rem;
     margin-top: 1rem;
-    padding: 0.75rem;
-    font-size: 1.1rem;
-    width: 100%;
+    font-weight: bold;
+    color: #555;
+  }
+  .input-labels > div {
+    flex: 1;
+  }
+  .input-labels > div.zone-name-label {
+    flex: 2;
+  }
+  button#addZoneBtn, button#calculateBtn, button#resetBtn {
+    width: auto;
+    padding: 0.6rem 1.5rem;
+    margin-top: 1.5rem;
+    font-weight: bold;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.25s ease;
+    transition: background-color 0.3s ease;
   }
-  #addZoneBtn {
-    background-color: #28a745;
-    color: white;
-  }
-  #addZoneBtn:hover {
-    background-color: #1e7e34;
-  }
-  #locationBtn {
+  button#addZoneBtn {
     background-color: #007bff;
     color: white;
   }
-  #locationBtn:hover {
+  button#addZoneBtn:hover {
     background-color: #0056b3;
   }
-  #calculateBtn {
-    background-color: #17a2b8;
+  button#calculateBtn {
+    background-color: #28a745;
     color: white;
+    display: block;
+    margin: 1.5rem auto 0 auto;
+    width: 100%;
+    max-width: 300px;
   }
-  #calculateBtn:hover {
-    background-color: #117a8b;
+  button#calculateBtn:hover {
+    background-color: #1e7e34;
+  }
+  button#resetBtn {
+    background-color: #ffc107;
+    color: #333;
+    margin-left: 1rem;
+  }
+  button#resetBtn:hover {
+    background-color: #d39e00;
   }
   #results {
     margin-top: 2rem;
-    background: #e9f7fa;
-    padding: 1rem;
-    border-radius: 8px;
     white-space: pre-line;
-    box-shadow: inset 0 0 10px rgb(0 123 255 / 0.2);
-    font-size: 1rem;
-    line-height: 1.4;
-  }
-  .labels-row {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.25rem;
-    margin-bottom: 0.75rem;
-    font-weight: bold;
-    font-size: 0.95rem;
-    color: #555;
-  }
-  .labels-row > div {
-    flex-shrink: 0;
-  }
-  .labels-row > div.zone-name {
-    flex: 2;
-  }
-  .labels-row > div.zone-rate {
-    flex: 1;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
   @media (max-width: 480px) {
-    .zone-row, .labels-row {
+    .zone-row {
       flex-direction: column;
     }
-    .zone-row input, .labels-row > div {
+    .zone-row input, .zone-row button {
+      width: 100%;
+      flex: none !important;
+    }
+    .input-labels {
+      flex-direction: column;
+    }
+    .input-labels > div {
       width: 100%;
       flex: none;
-    }
-    .zone-row button {
-      width: 100%;
-      font-size: 1.5rem;
       margin-top: 0.25rem;
+    }
+    button#calculateBtn {
+      max-width: 100%;
     }
   }
 </style>
 </head>
 <body>
 
-<div id="container">
-  <h1>Sprinkler Runtime Calculator</h1>
-  <p class="description">
-    Calculate the runtime for each sprinkler zone based on weather forecast data.<br/>
-    <br/>
-    Formula used (variables: <code>W</code>=watering frequency in days, <code>ET</code>=weekly evapotranspiration, <code>R</code>=weekly rainfall, <code>Rate</code>=minutes per 1" water):<br/>
-    <code>Runtime = YOUR_FORMULA</code><br/>
-    <br/>
-    Enter your own formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (default: <code> (W / 7) * (ET * 0.75 - R) * Rate </code>)
-  </p>
-
-  <label>
-    Latitude:
-    <input type="number" id="latitude" placeholder="Enter latitude (e.g., 47.94)" step="0.0001" />
-  </label>
-
-  <label>
-    Longitude:
-    <input type="number" id="longitude" placeholder="Enter longitude (e.g., -122.21)" step="0.0001" />
-  </label>
-
-  <button id="locationBtn" type="button">Use My Current Location</button>
-
-  <label>
-    Watering Frequency (every X days):
-    <input type="number" id="wateringFrequency" placeholder="e.g., 2 (water every 2 days)" min="1" />
-  </label>
-
-  <label>
-    ET Replacement Percentage (%):
-    <input type="number" id="etReplacement" placeholder="e.g., 75 for 75%" min="0" max="100" />
-  </label>
-
-  <label>
-    Runtime Formula:
-    <input type="text" id="formulaInput" placeholder="e.g., (W / 7) * (ET * 0.75 - R) * Rate" />
-  </label>
-
-  <div id="sprinklerZones">
-    <div class="labels-row">
-      <div class="zone-name">Sprinkler Zone Name</div>
-      <div class="zone-rate">Runtime per 1" (minutes)</div>
-      <div style="width: 32px;"></div>
-    </div>
-    <!-- Zone rows go here -->
-  </div>
-
-  <button id="addZoneBtn" type="button">+ Add Sprinkler Zone</button>
-  <button id="calculateBtn" type="button">Calculate Runtime</button>
-
-  <div id="results" style="display:none;"></div>
+<h1>Sprinkler Runtime Calculator</h1>
+<div id="description">
+  <p>This calculator estimates sprinkler runtimes based on your local weekly evapotranspiration (ET) and rainfall forecast.</p>
+  <p>Formula used for each zone runtime:<br>
+     <em>Runtime = Watering Frequency (days/7) × (ET Replacement % × Weekly ET - Weekly Rainfall) × Minutes per inch rate</em></p>
+  <p>Adjust your zones, watering frequency, and ET replacement % below.</p>
 </div>
 
+<label for="latitude">Latitude:</label>
+<input type="number" id="latitude" placeholder="Enter latitude (e.g. 47.94)" step="0.0001" />
+
+<label for="longitude">Longitude:</label>
+<input type="number" id="longitude" placeholder="Enter longitude (e.g. -122.21)" step="0.0001" />
+
+<label for="wateringFrequency">Watering Frequency (every x days):</label>
+<input type="number" id="wateringFrequency" placeholder="Enter watering frequency, e.g. 2 (default)" min="1" />
+
+<label for="etReplacement">ET Replacement Percentage (0-100%):</label>
+<input type="number" id="etReplacement" placeholder="Enter ET replacement %, e.g. 75" min="0" max="100" />
+
+<div class="input-labels">
+  <div class="zone-name-label">Sprinkler Zone Name</div>
+  <div>Minutes per 1" Water</div>
+  <div style="width: 40px;"></div>
+</div>
+<div id="zones-container"></div>
+
+<button id="addZoneBtn">Add Sprinkler Zone</button>
+
+<button id="calculateBtn">Calculate Runtime</button>
+
+<button id="resetBtn">Reset to Defaults</button>
+
+<div id="results"></div>
+
 <script>
-  const zonesContainer = document.getElementById("sprinklerZones");
-  const resultsDiv = document.getElementById("results");
-  const defaultFormula = "(W / 7) * (ET * ETrepl - R) * Rate";
-
-  // Add a sprinkler zone input row
-  function addZone(name = "", rate = "") {
+  // Utility functions
+  function createZoneRow(name = "", rate = "") {
     const div = document.createElement("div");
-    div.classList.add("zone-row");
-    div.innerHTML = `
-      <input type="text" class="zone-name" placeholder="Zone name" value="${name}" />
-      <input type="number" class="zone-rate" min="0" placeholder="Minutes per 1 inch" value="${rate}" />
-      <button type="button" title="Remove zone" aria-label="Remove zone">×</button>
-    `;
-    const btn = div.querySelector("button");
-    btn.onclick = () => div.remove();
-    zonesContainer.appendChild(div);
+    div.className = "zone-row";
+
+    const inputName = document.createElement("input");
+    inputName.type = "text";
+    inputName.className = "zone-name";
+    inputName.placeholder = "Zone name (e.g. Front Yard)";
+    inputName.value = name;
+
+    const inputRate = document.createElement("input");
+    inputRate.type = "number";
+    inputRate.className = "zone-rate";
+    inputRate.placeholder = "Minutes per inch (e.g. 240)";
+    inputRate.min = 0;
+    inputRate.value = rate;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "×";
+    removeBtn.title = "Remove zone";
+    removeBtn.addEventListener("click", () => {
+      div.remove();
+      saveSettings();
+    });
+
+    div.appendChild(inputName);
+    div.appendChild(inputRate);
+    div.appendChild(removeBtn);
+    return div;
   }
 
-  // Start with one empty zone on page load
-  addZone();
+  // Save/load from localStorage
+  function saveSettings() {
+    const latitude = document.getElementById("latitude").value;
+    const longitude = document.getElementById("longitude").value;
+    const wateringFrequency = document.getElementById("wateringFrequency").value;
+    const etReplacement = document.getElementById("etReplacement").value;
 
-  // Location button
-  document.getElementById("locationBtn").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-      return;
+    const zones = [];
+    document.querySelectorAll(".zone-row").forEach(row => {
+      const name = row.querySelector(".zone-name").value.trim();
+      const rate = row.querySelector(".zone-rate").value.trim();
+      if(name && rate) zones.push({name, rate});
+    });
+
+    const settings = {
+      latitude, longitude, wateringFrequency, etReplacement, zones
+    };
+    localStorage.setItem("sprinklerSettings", JSON.stringify(settings));
+  }
+
+  function loadSettings() {
+    const settingsStr = localStorage.getItem("sprinklerSettings");
+    if(!settingsStr) return false;
+    try {
+      const settings = JSON.parse(settingsStr);
+      if(settings.latitude) document.getElementById("latitude").value = settings.latitude;
+      if(settings.longitude) document.getElementById("longitude").value = settings.longitude;
+      if(settings.wateringFrequency) document.getElementById("wateringFrequency").value = settings.wateringFrequency;
+      if(settings.etReplacement) document.getElementById("etReplacement").value = settings.etReplacement;
+      if(settings.zones && Array.isArray(settings.zones)) {
+        const container = document.getElementById("zones-container");
+        container.innerHTML = "";
+        settings.zones.forEach(z => {
+          container.appendChild(createZoneRow(z.name, z.rate));
+        });
+      }
+      return true;
+    } catch(e) {
+      console.error("Error loading settings:", e);
+      return false;
     }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        document.getElementById("latitude").value = pos.coords.latitude.toFixed(4);
-        document.getElementById("longitude").value = pos.coords.longitude.toFixed(4);
-      },
-      (err) => alert("Could not get location: " + err.message)
-    );
-  });
-
-  // Add zone button
-  document.getElementById("addZoneBtn").addEventListener("click", () => addZone());
-
-  // Helper functions
-  function sumArray(arr) {
-    return arr.reduce((a, b) => a + b, 0);
   }
 
-  function formatMinutes(mins) {
-    if (mins <= 0) return "0 min";
-    let hrs = Math.floor(mins / 60);
-    let minutes = Math.round(mins % 60);
-    return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
-  }
-
+  // Fetch weather data from Open-Meteo
   async function fetchWeatherData(lat, lon) {
     const today = new Date();
-    const startDate = today.toISOString().slice(0, 10);
+    const startDate = today.toISOString().slice(0,10);
     const endDateObj = new Date();
     endDateObj.setDate(today.getDate() + 6);
-    const endDate = endDateObj.toISOString().slice(0, 10);
+    const endDate = endDateObj.toISOString().slice(0,10);
 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
       `&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
 
     const resp = await fetch(url);
-    if (!resp.ok) throw new Error("Failed to fetch weather data");
+    if(!resp.ok) throw new Error("Failed to fetch weather data");
     return resp.json();
   }
 
-  // Evaluate formula safely with user input
-  function evaluateFormula(formula, vars) {
-    try {
-      // Replace variable names with values in formula string
-      let exp = formula;
-      for (const [key, val] of Object.entries(vars)) {
-        const regex = new RegExp(`\\b${key}\\b`, "g");
-        exp = exp.replace(regex, val);
-      }
-      // Basic validation to allow only numbers and math operators
-      if (!/^[0-9+\-*/().\s]+$/.test(exp)) {
-        throw new Error("Invalid characters in formula.");
-      }
-      // eslint-disable-next-line no-new-func
-      return Function(`"use strict";return (${exp})`)();
-    } catch {
-      throw new Error("Formula evaluation failed. Please check your formula syntax.");
-    }
+  function sumArray(arr) {
+    return arr.reduce((a,b) => a + b, 0);
   }
 
-  // Calculate button
-  document.getElementById("calculateBtn").addEventListener("click", async () => {
-    resultsDiv.style.display = "block";
-    resultsDiv.textContent = "Fetching weather data...";
+  // Calculate runtime formula: W*(ET%*ET - R)*rate, where W = watering freq (days/7)
+  function calculateRuntime(ratePerInch, ET, R, wateringFrequencyDays, etReplacementPercent) {
+    const W = wateringFrequencyDays ? wateringFrequencyDays / 7 : 2/7;  // default 2/7
+    const etReplace = etReplacementPercent ? etReplacementPercent / 100 : 0.75; // default 0.75
+    const adjustedInches = W * (etReplace * ET - R);
+    if(adjustedInches <= 0) return 0;
+    return adjustedInches * ratePerInch;
+  }
+
+  function formatMinutes(mins) {
+    if(mins <= 0) return "0 min";
+    const hrs = Math.floor(mins / 60);
+    const minutes = Math.round(mins % 60);
+    return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
+  }
+
+  // Clear results if empty input (prevent blank white box)
+  function clearResults() {
+    const output = document.getElementById("results");
+    output.textContent = "";
+  }
+
+  // Main calculation function
+  async function calculateSprinklerTimes() {
+    const output = document.getElementById("results");
+    output.textContent = "Fetching weather data...";
 
     const lat = parseFloat(document.getElementById("latitude").value);
     const lon = parseFloat(document.getElementById("longitude").value);
-    if (isNaN(lat) || isNaN(lon)) {
-      resultsDiv.textContent = "Please enter valid latitude and longitude.";
+    if(isNaN(lat) || isNaN(lon)) {
+      output.textContent = "Please enter valid latitude and longitude.";
       return;
     }
 
-    let W = parseFloat(document.getElementById("wateringFrequency").value);
-    if (isNaN(W) || W <= 0) W = 2;
+    const wateringFrequencyInput = document.getElementById("wateringFrequency").value;
+    const wateringFrequency = wateringFrequencyInput ? parseFloat(wateringFrequencyInput) : 2;
 
-    let ETrepl = parseFloat(document.getElementById("etReplacement").value);
-    if (isNaN(ETrepl) || ETrepl < 0 || ETrepl > 100) ETrepl = 75;
-    ETrepl = ETrepl / 100;
+    const etReplacementInput = document.getElementById("etReplacement").value;
+    const etReplacement = etReplacementInput ? parseFloat(etReplacementInput) : 75;
 
-    const formulaRaw = document.getElementById("formulaInput").value.trim();
-    const formula = formulaRaw || "(W / 7) * (ET * ETrepl - R) * Rate";
+    if(wateringFrequency <= 0 || etReplacement < 0 || etReplacement > 100) {
+      output.textContent = "Please enter valid values for watering frequency and ET replacement %.";
+      return;
+    }
 
-    // Read sprinkler zones
     const zones = [];
-    const rows = zonesContainer.querySelectorAll(".zone-row");
-    for (const row of rows) {
+    document.querySelectorAll(".zone-row").forEach(row => {
       const name = row.querySelector(".zone-name").value.trim();
-      const rateStr = row.querySelector(".zone-rate").value;
-      const rate = parseFloat(rateStr);
-      if (!name || isNaN(rate) || rate < 0) {
-        resultsDiv.textContent = "Please enter valid zone names and runtimes.";
-        return;
+      const rate = parseFloat(row.querySelector(".zone-rate").value);
+      if(name && !isNaN(rate) && rate > 0) {
+        zones.push({name, ratePerInch: rate});
       }
-      zones.push({ name, rate });
+    });
+
+    if(zones.length === 0) {
+      output.textContent = "Please add at least one sprinkler zone with valid name and rate.";
+      return;
     }
 
     try {
       const data = await fetchWeatherData(lat, lon);
 
-      if (!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
-        resultsDiv.textContent = "Incomplete weather data received.";
+      if(!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
+        output.textContent = "Incomplete weather data received.";
         return;
       }
 
       const weeklyRainfall = sumArray(data.daily.precipitation_sum);
       const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
 
-      // Calculate runtimes
-      const resultLines = zones.map(({ name, rate }) => {
-        // Prepare vars for formula
-        const vars = {
-          W,
-          ET: weeklyET,
-          R: weeklyRainfall,
-          Rate: rate,
-          ETrepl,
-        };
-        let runtime;
-        try {
-          runtime = evaluateFormula(formula, vars);
-        } catch (err) {
-          resultsDiv.textContent = err.message;
-          throw err;
-        }
-        if (runtime < 0) runtime = 0;
+      const resultLines = zones.map(({name, ratePerInch}) => {
+        const runtime = calculateRuntime(ratePerInch, weeklyET, weeklyRainfall, wateringFrequency, etReplacement);
         return `${name}: ${formatMinutes(runtime)}`;
       });
 
-      resultsDiv.innerHTML =
-        `<strong>Weekly ET (evapotranspiration):</strong> ${weeklyET.toFixed(3)} inches<br>` +
-        `<strong>Predicted 7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} inches<br><br>` +
-        `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% weekly ET replacement):</strong><br>` +
-        resultLines.join("<br>");
-    } catch (error) {
-      if (!resultsDiv.textContent.includes("Formula evaluation failed")) {
-        resultsDiv.textContent = `Error fetching weather data: ${error.message}`;
-      }
+      // Show basic text results
+      let resultText = 
+        `Weekly ET: ${weeklyET.toFixed(3)} inches\n` +
+        `Predicted 7-Day Rainfall: ${weeklyRainfall.toFixed(3)} inches\n\n` +
+        `Sprinkler Timing (every ${wateringFrequency} day(s)):\n` +
+        resultLines.join("\n");
+
+      output.textContent = resultText;
+
+      // Save current settings to localStorage
+      saveSettings();
+
+    } catch(error) {
+      output.textContent = `Error: ${error.message}`;
+    }
+  }
+
+  // Add new zone button handler
+  document.getElementById("addZoneBtn").addEventListener("click", () => {
+    const container = document.getElementById("zones-container");
+    container.appendChild(createZoneRow());
+    saveSettings();
+  });
+
+  // Calculate button handler
+  document.getElementById("calculateBtn").addEventListener("click", calculateSprinklerTimes);
+
+  // Reset button handler with confirm
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if(confirm("Reset all inputs to default values? This will clear saved settings.")) {
+      localStorage.removeItem("sprinklerSettings");
+      // Clear inputs
+      document.getElementById("latitude").value = "";
+      document.getElementById("longitude").value = "";
+      document.getElementById("wateringFrequency").value = "";
+      document.getElementById("etReplacement").value = "";
+      document.getElementById("zones-container").innerHTML = "";
+      clearResults();
+    }
+  });
+
+  // Save changes on input changes for zones and settings
+  document.getElementById("latitude").addEventListener("input", saveSettings);
+  document.getElementById("longitude").addEventListener("input", saveSettings);
+  document.getElementById("wateringFrequency").addEventListener("input", saveSettings);
+  document.getElementById("etReplacement").addEventListener("input", saveSettings);
+  document.getElementById("zones-container").addEventListener("input", saveSettings);
+
+  // Load saved settings on page load
+  window.addEventListener("DOMContentLoaded", () => {
+    const loaded = loadSettings();
+    if (!loaded) {
+      // If no saved data, add one empty zone row
+      document.getElementById("zones-container").appendChild(createZoneRow());
     }
   });
 </script>
