@@ -185,7 +185,7 @@
 </head>
 <body>
 <div id="container">
-  <h1>Sprinkler Runtime Calculator</h1>
+  <h1 id="pageTop">Sprinkler Runtime Calculator</h1>
   <br/>
   <p class="description">
     Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/>
@@ -417,6 +417,8 @@
     let lat, lon;
     if (!loc) {
       resultsDiv.textContent = "Please enter a valid ZIP code (5 digits) or both latitude and longitude.";
+      // Scroll to results for error message
+      resultsDiv.scrollIntoView({ behavior: 'smooth' });
       return;
     }
     if (loc.mode === "zip") {
@@ -430,6 +432,7 @@
         lonInput.value = lon.toFixed(4);
       } catch (e) {
         resultsDiv.textContent = "Could not find latitude/longitude for ZIP code: " + e.message;
+        resultsDiv.scrollIntoView({ behavior: 'smooth' });
         return;
       }
     } else if (loc.mode === "latlon") {
@@ -456,6 +459,7 @@
       const rate = parseFloat(rateStr);
       if (!name || isNaN(rate) || rate < 0) {
         resultsDiv.textContent = "Please enter valid zone names and runtimes.";
+        resultsDiv.scrollIntoView({ behavior: 'smooth' });
         return;
       }
       zones.push({ name, rate });
@@ -467,6 +471,7 @@
 
       if (!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
         resultsDiv.textContent = "Incomplete weather data received.";
+        resultsDiv.scrollIntoView({ behavior: 'smooth' });
         return;
       }
 
@@ -487,6 +492,7 @@
           runtime = evaluateFormula(formula, vars);
         } catch (err) {
           resultsDiv.textContent = err.message;
+          resultsDiv.scrollIntoView({ behavior: 'smooth' });
           throw err;
         }
         if (runtime < 0) runtime = 0;
@@ -498,10 +504,13 @@
         `<strong>Predicted 7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} inches<br><br>` +
         `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% weekly ET replacement):</strong><br>` +
         resultLines.join("<br>");
+      // Scroll to the results (even on success)
+      resultsDiv.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       if (!resultsDiv.textContent.includes("Formula evaluation failed")) {
         resultsDiv.textContent = `Error fetching weather data: ${error.message}`;
       }
+      resultsDiv.scrollIntoView({ behavior: 'smooth' });
     }
   });
 
@@ -540,6 +549,15 @@
     // Hide results
     resultsDiv.style.display = "none";
     resultsDiv.textContent = "";
+
+    // Scroll to top of page smoothly
+    // Prefer scrolling to the main container's top (or the heading)
+    const pageTop = document.getElementById("pageTop");
+    if (pageTop && typeof pageTop.scrollIntoView === "function") {
+      pageTop.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   });
 
 </script>
