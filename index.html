@@ -168,9 +168,9 @@
 <div id="container">
   <h1>Sprinkler Runtime Calculator</h1>
   <p class="description">
-    Calculate the runtime for each sprinkler zone based on NOAA GFS weather forecast data.<br/>
+    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/>
     <br/>
-    Formula used (variables: <code>W</code>=watering frequency in days, <code>ET</code>=weekly evapotranspiration, <code>R</code>=weekly rainfall, <code>Rate</code>=minutes per 1" water):<br/>
+    Formula uses variables: <code>W</code>=watering frequency in days, <code>ET</code>=weekly evapotranspiration in inches, <code>R</code>=weekly rainfall in inches, <code>Rate</code>=minutes per 1" water<br/>
     <br/>
     Optional: Enter your own formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (default: <code> (W / 7) * (ET * 0.75 - R) * Rate </code>)
   </p>
@@ -188,17 +188,17 @@
   <button id="locationBtn" type="button">Use My Current Location</button>
 
   <label>
-    Watering Frequency (every X days) (Optional):
+    (Optional) Watering Frequency (every X days):
     <input type="number" id="wateringFrequency" placeholder="Default: 2 (water every 2 days)" min="1" />
   </label>
 
   <label>
-    ET Replacement Percentage (%) (Optional):
+    (Optional) ET Replacement Percentage (%):
     <input type="number" id="etReplacement" placeholder="Default: 75 for 75%" min="0" max="100" />
   </label>
 
   <label>
-    Runtime Formula (Optional):
+    (Optional) Runtime Formula Override:
     <input type="text" id="formulaInput" placeholder="Default: (W / 7) * (ET * 0.75 - R) * Rate" />
   </label>
 
