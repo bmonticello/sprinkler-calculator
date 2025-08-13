@@ -49,6 +49,24 @@
     border-radius: 6px;
     box-sizing: border-box;
   }
+  #suggestions {
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background: white;
+    z-index: 10;
+    width: calc(100% - 2px);
+    display: none;
+  }
+  #suggestions div {
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  #suggestions div:hover {
+    background: #f0f0f0;
+  }
   #sprinklerZones {
     margin-top: 1rem;
     background: #f9fafb;
@@ -168,34 +186,35 @@
   <h1>Sprinkler Runtime Calculator</h1>
   <br/>
   <p class="description">
-    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/><br/>
-    The runtime formula uses variables:<br/><br/>
-    <code>W</code> = watering frequency in days<br/>
-    <code>ET</code> = weekly evapotranspiration in inches for your location<br/>
-    <code>R</code> = weekly total rainfall in inches for your location<br/>
-    <code>Rate</code> = minutes to irrigate 1" water for your sprinklers<br/><br/>
-    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (default values and formula: <br/><br/>
-    <code>(W / 7) * (ET * 0.75 - R) * Rate</code>)
+    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/>
+    <br/>
+    The runtime formula uses variables:
+    <br/><br/>
+    <code>W</code> = watering frequency in days
+    <br/>
+    <code>ET</code> = weekly evapotranspiration in inches for your location
+    <br/>
+    <code>R</code> = weekly total rainfall in inches for your location
+    <br/>
+    <code>Rate</code> = minutes to irrigate 1" water for your sprinklers
+    <br/><br/>
+    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>.
   </p>
 
   <label>
-    ZIP Code:
-    <input type="text" id="zipCode" placeholder="Enter ZIP Code" />
-  </label>
-
-  <label>
-    City:
-    <input type="text" id="city" placeholder="City will auto-fill" />
+    Location (City, Town, ZIP, or Address):
+    <input type="text" id="locationInput" placeholder="Enter city, town, ZIP code, or address" autocomplete="off" />
+    <div id="suggestions"></div>
   </label>
 
   <label>
     Latitude:
-    <input type="number" id="latitude" placeholder="Enter latitude (e.g., 47.94)" step="0.0001" />
+    <input type="number" id="latitude" placeholder="Enter latitude" step="0.0001" />
   </label>
 
   <label>
     Longitude:
-    <input type="number" id="longitude" placeholder="Enter longitude (e.g., -122.21)" step="0.0001" />
+    <input type="number" id="longitude" placeholder="Enter longitude" step="0.0001" />
   </label>
 
   <button id="locationBtn" type="button">Use My Current Location</button>
@@ -232,6 +251,7 @@
 <script>
   const zonesContainer = document.getElementById("sprinklerZones");
   const resultsDiv = document.getElementById("results");
+  let selectedCoords = null;
 
   function addZone(name = "", rate = "") {
     const div = document.createElement("div");
@@ -239,87 +259,125 @@
     div.innerHTML = `
       <input type="text" class="zone-name" placeholder="Zone name" value="${name}" />
       <input type="number" class="zone-rate" min="0" placeholder="Minutes per 1 inch" value="${rate}" />
-      <button type="button">×</button>
+      <button type="button" title="Remove zone">×</button>
     `;
     div.querySelector("button").onclick = () => div.remove();
     zonesContainer.appendChild(div);
   }
   addZone();
 
-  document.getElementById("addZoneBtn").onclick = () => addZone();
+  document.getElementById("addZoneBtn").addEventListener("click", () => addZone());
 
-  document.getElementById("locationBtn").onclick = () => {
-    if (!navigator.geolocation) return alert("Geolocation not supported.");
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        document.getElementById("latitude").value = pos.coords.latitude.toFixed(4);
-        document.getElementById("longitude").value = pos.coords.longitude.toFixed(4);
-      },
-      err => alert("Could not get location: " + err.message)
-    );
-  };
-
-  async function fetchCityFromZip(zip) {
-    try {
-      const resp = await fetch(`https://api.zippopotam.us/us/${zip}`);
-      if (!resp.ok) return;
-      const data = await resp.json();
-      if (data.places && data.places.length > 0) {
-        document.getElementById("city").value = data.places[0]["place name"];
-        document.getElementById("latitude").value = parseFloat(data.places[0].latitude).toFixed(4);
-        document.getElementById("longitude").value = parseFloat(data.places[0].longitude).toFixed(4);
-      }
-    } catch {}
+  async function searchLocation(query) {
+    if (query.length < 2) {
+      document.getElementById("suggestions").style.display = "none";
+      return;
+    }
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`;
+    const resp = await fetch(url);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const suggestionsDiv = document.getElementById("suggestions");
+    suggestionsDiv.innerHTML = "";
+    data.forEach(item => {
+      const div = document.createElement("div");
+      div.textContent = item.display_name;
+      div.onclick = () => {
+        document.getElementById("locationInput").value = item.display_name;
+        selectedCoords = { lat: parseFloat(item.lat), lon: parseFloat(item.lon) };
+        suggestionsDiv.style.display = "none";
+      };
+      suggestionsDiv.appendChild(div);
+    });
+    suggestionsDiv.style.display = data.length ? "block" : "none";
   }
 
-  document.getElementById("zipCode").addEventListener("input", e => {
-    const zip = e.target.value.trim();
-    if (/^\d{5}$/.test(zip)) {
-      fetchCityFromZip(zip);
+  document.getElementById("locationInput").addEventListener("input", e => {
+    selectedCoords = null;
+    searchLocation(e.target.value);
+  });
+
+  document.addEventListener("click", e => {
+    if (!document.getElementById("locationInput").contains(e.target) &&
+        !document.getElementById("suggestions").contains(e.target)) {
+      document.getElementById("suggestions").style.display = "none";
     }
+  });
+
+  document.getElementById("locationBtn").addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude.toFixed(4);
+      const lon = pos.coords.longitude.toFixed(4);
+      document.getElementById("latitude").value = lat;
+      document.getElementById("longitude").value = lon;
+      selectedCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
+      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      const data = await resp.json();
+      document.getElementById("locationInput").value = data.display_name || "";
+    }, err => alert("Location error: " + err.message));
   });
 
   function sumArray(arr) {
     return arr.reduce((a, b) => a + b, 0);
   }
+
   function formatMinutes(mins) {
     if (mins <= 0) return "0 min";
     let hrs = Math.floor(mins / 60);
     let minutes = Math.round(mins % 60);
     return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
   }
+
   async function fetchWeatherData(lat, lon) {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
     const resp = await fetch(url);
-    if (!resp.ok) throw new Error("Failed to fetch weather data");
+    if (!resp.ok) throw new Error("Weather fetch failed");
     return resp.json();
   }
+
   function evaluateFormula(formula, vars) {
-    let exp = formula;
-    for (const [k, v] of Object.entries(vars)) {
-      exp = exp.replace(new RegExp(`\\b${k}\\b`, "g"), v);
+    try {
+      let exp = formula;
+      for (const [key, val] of Object.entries(vars)) {
+        exp = exp.replace(new RegExp(`\\b${key}\\b`, "g"), val);
+      }
+      if (!/^[0-9+\-*/().\s]+$/.test(exp)) throw new Error("Invalid characters in formula.");
+      return Function(`"use strict";return (${exp})`)();
+    } catch {
+      throw new Error("Formula evaluation failed.");
     }
-    if (!/^[0-9+\-*/().\s]+$/.test(exp)) throw new Error("Invalid characters in formula.");
-    return Function(`"use strict";return (${exp})`)();
   }
 
-  document.getElementById("calculateBtn").onclick = async () => {
+  document.getElementById("calculateBtn").addEventListener("click", async () => {
     resultsDiv.style.display = "block";
     resultsDiv.textContent = "Fetching weather data...";
 
-    const lat = parseFloat(document.getElementById("latitude").value);
-    const lon = parseFloat(document.getElementById("longitude").value);
-    if (isNaN(lat) || isNaN(lon)) {
-      resultsDiv.textContent = "Please enter valid latitude and longitude.";
+    let lat = parseFloat(document.getElementById("latitude").value);
+    let lon = parseFloat(document.getElementById("longitude").value);
+
+    if (!selectedCoords && (isNaN(lat) || isNaN(lon))) {
+      resultsDiv.textContent = "Please enter a location or latitude/longitude.";
       return;
     }
+    if (selectedCoords) {
+      lat = selectedCoords.lat;
+      lon = selectedCoords.lon;
+    }
 
-    let W = parseFloat(document.getElementById("wateringFrequency").value) || 2;
+    let W = parseFloat(document.getElementById("wateringFrequency").value);
+    if (isNaN(W) || W <= 0) W = 2;
+
     let ETrepl = parseFloat(document.getElementById("etReplacement").value);
     if (isNaN(ETrepl) || ETrepl < 0 || ETrepl > 100) ETrepl = 75;
-    ETrepl /= 100;
+    ETrepl = ETrepl / 100;
 
-    const formula = document.getElementById("formulaInput").value.trim() || "(W / 7) * (ET * ETrepl - R) * Rate";
+    const formulaRaw = document.getElementById("formulaInput").value.trim();
+    const formula = formulaRaw || "(W / 7) * (ET * ETrepl - R) * Rate";
+
     const zones = [];
     for (const row of zonesContainer.querySelectorAll(".zone-row")) {
       const name = row.querySelector(".zone-name").value.trim();
@@ -336,18 +394,25 @@
       const weeklyRainfall = sumArray(data.daily.precipitation_sum);
       const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
       const resultLines = zones.map(({ name, rate }) => {
-        const runtime = Math.max(0, evaluateFormula(formula, { W, ET: weeklyET, R: weeklyRainfall, Rate: rate, ETrepl }));
-        return `${name}: ${formatMinutes(runtime)}`;
+        try {
+          let runtime = evaluateFormula(formula, { W, ET: weeklyET, R: weeklyRainfall, Rate: rate, ETrepl });
+          if (runtime < 0) runtime = 0;
+          return `${name}: ${formatMinutes(runtime)}`;
+        } catch (err) {
+          resultsDiv.textContent = err.message;
+          throw err;
+        }
       });
+
       resultsDiv.innerHTML =
         `<strong>Weekly ET:</strong> ${weeklyET.toFixed(3)} in<br>` +
         `<strong>7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>` +
         `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>` +
         resultLines.join("<br>");
-    } catch (err) {
-      resultsDiv.textContent = `Error: ${err.message}`;
+    } catch (error) {
+      resultsDiv.textContent = `Error: ${error.message}`;
     }
-  };
+  });
 </script>
 </body>
 </html>
