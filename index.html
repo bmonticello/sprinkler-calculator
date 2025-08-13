@@ -40,6 +40,11 @@
     margin-top: 1rem;
     font-weight: bold;
   }
+  .input-note {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.3rem;
+  }
   input[type="number"], input[type="text"] {
     padding: 0.6rem;
     font-size: 1rem;
@@ -186,21 +191,16 @@
   <h1>Sprinkler Runtime Calculator</h1>
   <br/>
   <p class="description">
-    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/>
-    <br/>
-    The runtime formula uses variables:
-    <br/><br/>
-    <code>W</code> = watering frequency in days
-    <br/>
-    <code>ET</code> = weekly evapotranspiration in inches for your location
-    <br/>
-    <code>R</code> = weekly total rainfall in inches for your location
-    <br/>
-    <code>Rate</code> = minutes to irrigate 1" water for your sprinklers
-    <br/><br/>
+    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/><br/>
+    The runtime formula uses variables:<br/><br/>
+    <code>W</code> = watering frequency in days<br/>
+    <code>ET</code> = weekly evapotranspiration in inches for your location<br/>
+    <code>R</code> = weekly total rainfall in inches for your location<br/>
+    <code>Rate</code> = minutes to irrigate 1" water for your sprinklers<br/><br/>
     Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>.
   </p>
 
+  <div class="input-note">Enter your location OR manually enter coordinates below:</div>
   <label>
     Location (City, Town, ZIP, or Address):
     <input type="text" id="locationInput" placeholder="Enter city, town, ZIP code, or address" autocomplete="off" />
@@ -268,22 +268,38 @@
 
   document.getElementById("addZoneBtn").addEventListener("click", () => addZone());
 
+  function isAddress(query) {
+    return /^\d+/.test(query.trim()) || /\b(st|street|rd|road|ave|avenue|blvd|drive|dr|ln|lane)\b/i.test(query);
+  }
+
+  function formatLocation(item, isAddr) {
+    const addr = item.address;
+    if (isAddr) {
+      return item.display_name;
+    }
+    const city = addr.city || addr.town || addr.village || addr.hamlet || "";
+    const state = addr.state || "";
+    const country = addr.country || "";
+    return [city, state, country].filter(Boolean).join(", ");
+  }
+
   async function searchLocation(query) {
     if (query.length < 2) {
       document.getElementById("suggestions").style.display = "none";
       return;
     }
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=us&q=${encodeURIComponent(query)}`;
     const resp = await fetch(url);
     if (!resp.ok) return;
     const data = await resp.json();
     const suggestionsDiv = document.getElementById("suggestions");
     suggestionsDiv.innerHTML = "";
+    const addrMode = isAddress(query);
     data.forEach(item => {
       const div = document.createElement("div");
-      div.textContent = item.display_name;
+      div.textContent = formatLocation(item, addrMode);
       div.onclick = () => {
-        document.getElementById("locationInput").value = item.display_name;
+        document.getElementById("locationInput").value = formatLocation(item, addrMode);
         selectedCoords = { lat: parseFloat(item.lat), lon: parseFloat(item.lon) };
         suggestionsDiv.style.display = "none";
       };
@@ -315,9 +331,10 @@
       document.getElementById("latitude").value = lat;
       document.getElementById("longitude").value = lon;
       selectedCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
-      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&countrycodes=us`);
       const data = await resp.json();
-      document.getElementById("locationInput").value = data.display_name || "";
+      const addrMode = isAddress(data.display_name);
+      document.getElementById("locationInput").value = formatLocation(data, addrMode);
     }, err => alert("Location error: " + err.message));
   });
 
