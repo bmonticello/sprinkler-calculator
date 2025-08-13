@@ -170,9 +170,9 @@
   <p class="description">
     Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/>
     <br/>
-    The runtime formula uses variables: <code>W</code> = watering frequency in days, <code>ET</code> = weekly evapotranspiration in inches, <code>R</code> = weekly total rainfall in inches, <code>Rate</code> = minutes per 1" water<br/>
+    The runtime formula uses variables: <code>W</code> = watering frequency in days, <code>ET</code> = weekly evapotranspiration in inches, <code>R</code> = weekly total rainfall in inches, <code>Rate</code> = minutes per 1" water.<br/>
     <br/>
-    Optional: Enter your own formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (default: <code> (W / 7) * (ET * 0.75 - R) * Rate </code>)
+    Optional: Enter your own formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (the default values and formula calculates runtime to replace 75% weekly ET by watering every 2 days: <code> (W / 7) * (ET * 0.75 - R) * Rate</code>).
   </p>
 
   <label>
