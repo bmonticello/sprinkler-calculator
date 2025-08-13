@@ -145,6 +145,8 @@
     Optional: Enter your own variable values and/or runtime formula using <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>.
   </p>
 
+  <button id="locationBtn" type="button">Use My Current Location</button>
+
   <label>
     Location (City, ZIP, or Address):
     <input type="text" id="locationInput" placeholder="Enter city, ZIP code, or address" autocomplete="off" />
@@ -162,8 +164,6 @@
     Longitude:
     <input type="number" id="longitude" placeholder="Enter longitude" step="0.0001" />
   </label>
-
-  <button id="locationBtn" type="button">Use My Current Location</button>
 
   <label>
     (Optional) Watering Frequency (days):
@@ -349,9 +349,10 @@
         return `${name}: ${formatMinutes(runtime)}`;
       });
       resultsDiv.innerHTML = `
+        <strong>Results:</strong><br><br>
         <strong>Weekly ET:</strong> ${weeklyET.toFixed(3)} in<br>
-        <strong>7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>
-        <strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>
+        <strong>7-Day Total Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>
+        <strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% weekly ET replacement):</strong><br>
         ${lines.join("<br>")}
       `;
     } catch (err) {
