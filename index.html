@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-2[...]'>
 <title>Sprinkler Runtime Calculator</title>
 <style>
   body {
@@ -120,6 +119,14 @@
   #calculateBtn:hover {
     background-color: #117a8b;
   }
+  #resetBtn {
+    background-color: #6c757d;
+    color: white;
+    margin-top: 0.5rem;
+  }
+  #resetBtn:hover {
+    background-color: #495057;
+  }
   #results {
     margin-top: 2rem;
     background: #e9f7fa;
@@ -199,7 +206,7 @@
 
   <div>
     <label>
-      Location <span class="required">*</span>:
+      Location<span class="required">* </span>:
     </label>
     <span class="location-note">Enter either a U.S. ZIP code <strong>or</strong> latitude/longitude.</span>
     <label>
@@ -215,10 +222,15 @@
       Longitude:
       <input type="number" id="longitude" placeholder="Enter longitude (e.g., -122.21)" step="0.0001" />
     </label>
-    <button id="locationBtn" type="button">Use My Current Location (Auto-fills ZIP & coordinates)</button>
+    <button id="locationBtn" type="button">Use My Current Location</button>
   </div>
 
   <div id="sprinklerZones">
+    <br/>
+    <label>
+      Enter Your Sprinkler Zones<span class="required">* </span>:
+    </label>
+    <br/>
     <div class="labels-row">
       <div class="zone-name">Sprinkler Zone Name</div>
       <div class="zone-rate">Runtime per 1" (minutes)</div>
@@ -228,7 +240,7 @@
   </div>
 
   <button id="addZoneBtn" type="button">+ Add Sprinkler Zone</button>
-
+  <br/>
   <label>
     Optional:
   </label>
@@ -249,6 +261,7 @@
   </label>
   
   <button id="calculateBtn" type="button">Calculate Runtime</button>
+  <button id="resetBtn" type="button">Reset All</button>
 
   <div id="results" style="display:none;"></div>
 </div>
@@ -259,6 +272,10 @@
   const zipcodeInput = document.getElementById("zipcode");
   const latInput = document.getElementById("latitude");
   const lonInput = document.getElementById("longitude");
+  const wateringFrequencyInput = document.getElementById("wateringFrequency");
+  const etReplacementInput = document.getElementById("etReplacement");
+  const formulaInput = document.getElementById("formulaInput");
+  const addZoneBtn = document.getElementById("addZoneBtn");
 
   // Add a sprinkler zone input row
   function addZone(name = "", rate = "") {
@@ -310,7 +327,7 @@
   });
 
   // Add zone button
-  document.getElementById("addZoneBtn").addEventListener("click", () => addZone());
+  addZoneBtn.addEventListener("click", () => addZone());
 
   // Helper functions
   function sumArray(arr) {
@@ -420,14 +437,14 @@
       lon = loc.lon;
     }
 
-    let W = parseFloat(document.getElementById("wateringFrequency").value);
+    let W = parseFloat(wateringFrequencyInput.value);
     if (isNaN(W) || W <= 0) W = 2;
 
-    let ETrepl = parseFloat(document.getElementById("etReplacement").value);
+    let ETrepl = parseFloat(etReplacementInput.value);
     if (isNaN(ETrepl) || ETrepl < 0 || ETrepl > 100) ETrepl = 75;
     ETrepl = ETrepl / 100;
 
-    const formulaRaw = document.getElementById("formulaInput").value.trim();
+    const formulaRaw = formulaInput.value.trim();
     const formula = formulaRaw || "(W / 7) * (ET * ETrepl - R) * Rate";
 
     // Read sprinkler zones
@@ -502,6 +519,28 @@
   }
   latInput.addEventListener("input", clearZipIfLatLon);
   lonInput.addEventListener("input", clearZipIfLatLon);
+
+  // RESET BUTTON FUNCTIONALITY
+  document.getElementById("resetBtn").addEventListener("click", function() {
+    // Clear all inputs
+    zipcodeInput.value = "";
+    latInput.value = "";
+    lonInput.value = "";
+    wateringFrequencyInput.value = "";
+    etReplacementInput.value = "";
+    formulaInput.value = "";
+
+    // Remove all zone rows
+    const zoneRows = zonesContainer.querySelectorAll(".zone-row");
+    zoneRows.forEach(row => row.remove());
+
+    // Add back one empty zone
+    addZone();
+
+    // Hide results
+    resultsDiv.style.display = "none";
+    resultsDiv.textContent = "";
+  });
 
 </script>
 </body>
