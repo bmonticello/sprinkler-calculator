@@ -194,141 +194,169 @@
 </div>
 
 <script>
-const zonesContainer = document.getElementById("sprinklerZones");
-const resultsDiv = document.getElementById("results");
-const suggestionsDiv = document.getElementById("suggestions");
-let selectedCoords = null;
+  const zonesContainer = document.getElementById("sprinklerZones");
+  const resultsDiv = document.getElementById("results");
+  const suggestionsDiv = document.getElementById("suggestions");
+  let selectedCoords = null;
 
-function addZone(name = "", rate = "") {
-  const div = document.createElement("div");
-  div.classList.add("zone-row");
-  div.innerHTML = `
-    <input type="text" class="zone-name" placeholder="Zone name" value="${name}" />
-    <input type="number" class="zone-rate" min="0" placeholder="Minutes per 1 inch" value="${rate}" />
-    <button type="button">×</button>
-  `;
-  div.querySelector("button").onclick = () => div.remove();
-  zonesContainer.appendChild(div);
-}
+  function addZone(name = "", rate = "") {
+    const div = document.createElement("div");
+    div.classList.add("zone-row");
+    div.innerHTML = `
+      <input type="text" class="zone-name" placeholder="Zone name" value="${name}" />
+      <input type="number" class="zone-rate" min="0" placeholder="Minutes per 1 inch" value="${rate}" />
+      <button type="button">×</button>
+    `;
+    div.querySelector("button").onclick = () => div.remove();
+    zonesContainer.appendChild(div);
+  }
+  addZone();
+  document.getElementById("addZoneBtn").onclick = () => addZone();
 
-addZone();
-document.getElementById("addZoneBtn").onclick = () => addZone();
+  function looksLikeAddress(q) {
+    return /^\d/.test(q.trim()) || /\b(st|street|rd|road|ave|avenue|blvd|drive|dr|lane|ln)\b/i.test(q);
+  }
 
-function looksLikeAddress(q) {
-  return /^\d/.test(q.trim()) || /\b(st|street|rd|road|ave|avenue|blvd|drive|dr|lane|ln)\b/i.test(q);
-}
-
-function formatSuggestion(item, isAddress) {
-  const addr = item.address || {};
-  if (isAddress) {
-    const road = addr.road || addr.pedestrian || "";
-    const house = addr.house_number || "";
+  function formatSuggestion(item, isAddress) {
+    const addr = item.address || {};
+    if (isAddress) return item.display_name;
     const city = addr.city || addr.town || addr.village || "";
     const state = addr.state || "";
     const postcode = addr.postcode || "";
-    return `${house} ${road}, ${city}, ${state} ${postcode}, ${addr.country || ""}`.replace(/\s+/g, ' ').trim();
-  } else {
-    return item.display_name;
-  }
-}
-
-async function fetchSuggestions(query) {
-  if (!query) {
-    suggestionsDiv.style.display = 'none';
-    return;
-  }
-  const isAddress = looksLikeAddress(query);
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`;
-  const res = await fetch(url);
-  const data = await res.json();
-  suggestionsDiv.innerHTML = '';
-  data.forEach(item => {
-    const div = document.createElement('div');
-    div.textContent = formatSuggestion(item, isAddress);
-    div.onclick = () => {
-      document.getElementById('locationInput').value = div.textContent;
-      document.getElementById('latitude').value = item.lat;
-      document.getElementById('longitude').value = item.lon;
-      selectedCoords = { lat: item.lat, lon: item.lon };
-      suggestionsDiv.style.display = 'none';
-    };
-    suggestionsDiv.appendChild(div);
-  });
-  suggestionsDiv.style.display = 'block';
-}
-
-document.getElementById('locationInput').addEventListener('input', (e) => fetchSuggestions(e.target.value));
-
-document.getElementById('locationBtn').onclick = () => {
-  navigator.geolocation.getCurrentPosition(pos => {
-    const lat = pos.coords.latitude.toFixed(4);
-    const lon = pos.coords.longitude.toFixed(4);
-    document.getElementById('latitude').value = lat;
-    document.getElementById('longitude').value = lon;
-    selectedCoords = { lat, lon };
-  }, err => alert("Unable to get location."));
-};
-
-document.getElementById('calculateBtn').onclick = async () => {
-  const lat = parseFloat(document.getElementById('latitude').value);
-  const lon = parseFloat(document.getElementById('longitude').value);
-  if (isNaN(lat) || isNaN(lon)) {
-    alert("Please provide valid latitude and longitude.");
-    return;
+    return [city, state, postcode].filter(s => s).join(", ");
   }
 
-  const zones = Array.from(document.querySelectorAll('.zone-row')).map(row => {
-    return {
-      name: row.querySelector('.zone-name').value,
-      rate: parseFloat(row.querySelector('.zone-rate').value)
-    };
-  }).filter(z => z.name && !isNaN(z.rate));
-
-  if (!zones.length) {
-    alert("Please add at least one sprinkler zone with valid rate.");
-    return;
-  }
-
-  const W = parseFloat(document.getElementById('wateringFrequency').value) || 2;
-  const ETreplace = parseFloat(document.getElementById('etReplacement').value) || 75;
-  const formulaOverride = document.getElementById('formulaInput').value;
-
-  // Placeholder for weather fetching; replace with NOAA GFS or other API
-  const ET = 1.0; // example weekly evapotranspiration in inches
-  const R = 0.2; // example weekly rainfall in inches
-
-  let outputText = `🏞️ Sprinkler Runtime Results\n\n`;
-  outputText += `Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}\n`;
-  outputText += `Watering Frequency (W): ${W} days\n`;
-  outputText += `Weekly Evapotranspiration (ET): ${ET.toFixed(2)} inches\n`;
-  outputText += `Weekly Rainfall Total (R): ${R.toFixed(2)} inches\n`;
-  outputText += `ET Replacement: ${ETreplace}%\n\n`;
-  outputText += `💧 Sprinkler Zone Runtimes:\n`;
-
-  zones.forEach(zone => {
-    const rate = zone.rate;
-    let runtime;
-    if (formulaOverride) {
-      try {
-        runtime = eval(formulaOverride.replace(/W/g, W).replace(/ET/g, ET).replace(/R/g, R).replace(/Rate/g, rate));
-      } catch (e) {
-        runtime = 0;
-      }
-    } else {
-      runtime = (W/7) * (ET*(ETreplace/100) - R) * rate;
+  async function searchLocation(query) {
+    if (query.length < 2) {
+      suggestionsDiv.style.display = "none";
+      return;
     }
-    runtime = Math.max(0, runtime).toFixed(1);
-    outputText += `• ${zone.name}: ${runtime} minutes\n`;
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=us&q=${encodeURIComponent(query)}`;
+      const resp = await fetch(url);
+      const data = resp.ok ? await resp.json() : [];
+      suggestionsDiv.innerHTML = "";
+      const isAddr = looksLikeAddress(query);
+      data.forEach(item => {
+        const div = document.createElement("div");
+        div.textContent = formatSuggestion(item, isAddr);
+        div.onclick = () => {
+          document.getElementById("locationInput").value = formatSuggestion(item, isAddr);
+          selectedCoords = { lat: parseFloat(item.lat), lon: parseFloat(item.lon) };
+          suggestionsDiv.style.display = "none";
+        };
+        suggestionsDiv.appendChild(div);
+      });
+      suggestionsDiv.style.display = data.length ? "block" : "none";
+    } catch {
+      suggestionsDiv.style.display = "none";
+    }
+  }
+
+  document.getElementById("locationInput").addEventListener("input", e => {
+    selectedCoords = null;
+    searchLocation(e.target.value);
+  });
+  document.addEventListener("click", e => {
+    if (!document.getElementById("locationInput").contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.style.display = "none";
+    }
   });
 
-  outputText += `\nExplanation:\n`;
-  outputText += `The runtime for each zone is calculated based on the weekly ET, rainfall, watering frequency, and your sprinkler rate.\n`;
-  outputText += `If ET*ET Replacement is greater than rainfall, the difference is applied to determine irrigation needed.\n`;
-  outputText += `Minutes per zone are adjusted according to each zone's Rate.\n`;
+  document.getElementById("locationBtn").onclick = () => {
+    if (!navigator.geolocation) return alert("Geolocation not supported.");
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude.toFixed(4);
+      const lon = pos.coords.longitude.toFixed(4);
+      document.getElementById("latitude").value = lat;
+      document.getElementById("longitude").value = lon;
+      selectedCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
+      try {
+        const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${lat}&lon=${lon}&countrycodes=us`);
+        if (!resp.ok) throw new Error();
+        const data = await resp.json();
+        const isAddr = looksLikeAddress(data.display_name || "");
+        document.getElementById("locationInput").value = formatSuggestion(data, isAddr);
+      } catch {
+        // No fallback changes needed
+      }
+    }, err => alert("Location error: " + err.message));
+  };
 
-  resultsDiv.textContent = outputText;
-  resultsDiv.style.display = 'block';
-};
+  function sumArray(arr) { return arr.reduce((a, b) => a + b, 0); }
+  function formatMinutes(mins) {
+    if (mins <= 0) return "0 min";
+    const hrs = Math.floor(mins / 60), minsOnly = Math.round(mins % 60);
+    return hrs > 0 ? `${hrs} hr ${minsOnly} min` : `${minsOnly} min`;
+  }
+  async function fetchWeatherData(lat, lon) {
+    const endpoint = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
+    const resp = await fetch(endpoint);
+    if (!resp.ok) throw new Error("Weather fetch failed");
+    return await resp.json();
+  }
+
+  function evaluateFormula(formula, vars) {
+    try {
+      let exp = formula;
+      for (const [k, v] of Object.entries(vars)) {
+        exp = exp.replace(new RegExp(`\\b${k}\\b`, "g"), v);
+      }
+      if (!/^[0-9+\-*/().\s]+$/.test(exp)) throw new Error("Invalid characters");
+      return Function(`"use strict"; return (${exp})`)();
+    } catch {
+      throw new Error("Formula evaluation failed.");
+    }
+  }
+
+  document.getElementById("calculateBtn").onclick = async () => {
+    resultsDiv.style.display = "block";
+    resultsDiv.textContent = "Fetching weather data...";
+    let lat = parseFloat(document.getElementById("latitude").value);
+    let lon = parseFloat(document.getElementById("longitude").value);
+    if (!selectedCoords && (isNaN(lat) || isNaN(lon))) {
+      return resultsDiv.textContent = "Please enter a location or latitude/longitude.";
+    }
+    if (selectedCoords) {
+      lat = selectedCoords.lat;
+      lon = selectedCoords.lon;
+    }
+    let W = parseFloat(document.getElementById("wateringFrequency").value);
+    if (isNaN(W) || W <= 0) W = 2;
+    let ETrepl = parseFloat(document.getElementById("etReplacement").value);
+    if (isNaN(ETrepl) || ETrepl < 0 || ETrepl > 100) ETrepl = 75;
+    ETrepl = ETrepl / 100;
+    const formulaRaw = document.getElementById("formulaInput").value.trim();
+    const formula = formulaRaw || "(W / 7) * (ET * ETrepl - R) * Rate";
+    const zones = [];
+    for (const row of zonesContainer.querySelectorAll(".zone-row")) {
+      const name = row.querySelector(".zone-name").value.trim();
+      const rate = parseFloat(row.querySelector(".zone-rate").value);
+      if (!name || isNaN(rate) || rate < 0) {
+        return resultsDiv.textContent = "Please enter valid zone names and runtimes.";
+      }
+      zones.push({ name, rate });
+    }
+
+    try {
+      const data = await fetchWeatherData(lat, lon);
+      const weeklyRainfall = sumArray(data.daily.precipitation_sum);
+      const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
+      const lines = zones.map(({ name, rate }) => {
+        let runtime = evaluateFormula(formula, { W, ET: weeklyET, R: weeklyRainfall, Rate: rate, ETrepl });
+        if (runtime < 0) runtime = 0;
+        return `${name}: ${formatMinutes(runtime)}`;
+      });
+      resultsDiv.innerHTML = `
+        <strong>Weekly ET:</strong> ${weeklyET.toFixed(3)} in<br>
+        <strong>7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>
+        <strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>
+        ${lines.join("<br>")}
+      `;
+    } catch (err) {
+      resultsDiv.textContent = `Error: ${err.message}`;
+    }
+  };
 </script>
 </body>
 </html>
