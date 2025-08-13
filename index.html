@@ -24,26 +24,20 @@
     box-shadow: 0 0 15px rgb(0 0 0 / 0.1);
     box-sizing: border-box;
   }
-  h1 {
-    text-align: center;
-    margin-bottom: 0.2rem;
-  }
+  h1 { text-align: center; margin-bottom: 0.2rem; }
   p.description {
     font-size: 0.9rem;
     color: #555;
-    margin-top: 0;
+    margin: 0;
     margin-bottom: 1.5rem;
     line-height: 1.4;
   }
-  label {
-    display: block;
-    margin-top: 1rem;
-    font-weight: bold;
-  }
-  .input-note {
-    font-size: 0.85rem;
+  label { display: block; margin-top: 1rem; font-weight: bold; }
+  .or-divider {
+    text-align: center;
+    margin: 1rem 0;
+    font-size: 1rem;
     color: #666;
-    margin-bottom: 0.3rem;
   }
   input[type="number"], input[type="text"] {
     padding: 0.6rem;
@@ -79,23 +73,15 @@
     padding: 1rem;
     border-radius: 8px;
   }
-  .zone-row {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
+  .zone-row { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; }
   .zone-row input {
     padding: 0.5rem;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 1rem;
   }
-  .zone-row input.zone-name {
-    flex: 2;
-  }
-  .zone-row input.zone-rate {
-    flex: 1;
-  }
+  .zone-row input.zone-name { flex: 2; }
+  .zone-row input.zone-rate { flex: 1; }
   .zone-row button {
     background: #dc3545;
     color: white;
@@ -107,9 +93,7 @@
     cursor: pointer;
     flex-shrink: 0;
   }
-  .zone-row button:hover {
-    background: #b02a37;
-  }
+  .zone-row button:hover { background: #b02a37; }
   button {
     margin-top: 1rem;
     padding: 0.75rem;
@@ -121,27 +105,12 @@
     font-weight: 600;
     transition: background-color 0.25s ease;
   }
-  #addZoneBtn {
-    background-color: #28a745;
-    color: white;
-  }
-  #addZoneBtn:hover {
-    background-color: #1e7e34;
-  }
-  #locationBtn {
-    background-color: #007bff;
-    color: white;
-  }
-  #locationBtn:hover {
-    background-color: #0056b3;
-  }
-  #calculateBtn {
-    background-color: #17a2b8;
-    color: white;
-  }
-  #calculateBtn:hover {
-    background-color: #117a8b;
-  }
+  #addZoneBtn { background-color: #28a745; color: white; }
+  #addZoneBtn:hover { background-color: #1e7e34; }
+  #locationBtn { background-color: #007bff; color: white; }
+  #locationBtn:hover { background-color: #0056b3; }
+  #calculateBtn { background-color: #17a2b8; color: white; }
+  #calculateBtn:hover { background-color: #117a8b; }
   #results {
     margin-top: 2rem;
     background: #e9f7fa;
@@ -152,60 +121,36 @@
     font-size: 1rem;
     line-height: 1.4;
   }
-  .labels-row {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.25rem;
-    margin-bottom: 0.75rem;
-    font-weight: bold;
-    font-size: 0.95rem;
-    color: #555;
-  }
-  .labels-row > div {
-    flex-shrink: 0;
-  }
-  .labels-row > div.zone-name {
-    flex: 2;
-  }
-  .labels-row > div.zone-rate {
-    flex: 1;
-  }
+  .labels-row { display: flex; gap: 0.75rem; margin: 0.25rem 0 0.75rem; font-weight: bold; font-size: 0.95rem; color: #555; }
+  .labels-row > div.zone-name { flex: 2; }
+  .labels-row > div.zone-rate { flex: 1; }
   @media (max-width: 480px) {
-    .zone-row, .labels-row {
-      flex-direction: column;
-    }
-    .zone-row input, .labels-row > div {
-      width: 100%;
-      flex: none;
-    }
-    .zone-row button {
-      width: 100%;
-      font-size: 1.5rem;
-      margin-top: 0.25rem;
-    }
+    .zone-row, .labels-row { flex-direction: column; }
+    .zone-row input, .labels-row > div { width: 100%; flex: none; }
+    .zone-row button { width: 100%; font-size: 1.5rem; margin-top: 0.25rem; }
   }
 </style>
 </head>
 <body>
 <div id="container">
   <h1>Sprinkler Runtime Calculator</h1>
-  <br/>
   <p class="description">
-    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br/><br/>
-    The runtime formula uses variables:<br/><br/>
-    <code>W</code> = watering frequency in days<br/>
-    <code>ET</code> = weekly evapotranspiration in inches for your location<br/>
-    <code>R</code> = weekly total rainfall in inches for your location<br/>
-    <code>Rate</code> = minutes to irrigate 1" water for your sprinklers<br/><br/>
-    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>.
+    Calculate the runtime for your sprinkler zones based on NOAA GFS weather forecast data.<br><br>
+    The runtime formula uses variables:<br><br>
+    <code>W</code> = watering frequency in days<br>
+    <code>ET</code> = weekly evapotranspiration in inches for your location<br>
+    <code>R</code> = weekly total rainfall in inches for your location<br>
+    <code>Rate</code> = minutes to irrigate 1" water for your sprinklers<br><br>
+    Optional: Enter your own variable values and/or runtime formula using <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>.
   </p>
 
-  <div class="input-note">Enter your location OR manually enter coordinates below:</div>
   <label>
-    Location (City, Town, ZIP, or Address):
-    <input type="text" id="locationInput" placeholder="Enter city, town, ZIP code, or address" autocomplete="off" />
+    Location (City, ZIP, or Address):
+    <input type="text" id="locationInput" placeholder="Enter city, ZIP code, or address" autocomplete="off" />
     <div id="suggestions"></div>
   </label>
+
+  <div class="or-divider">— OR —</div>
 
   <label>
     Latitude:
@@ -220,24 +165,24 @@
   <button id="locationBtn" type="button">Use My Current Location</button>
 
   <label>
-    (Optional) Watering Frequency (every X days):
+    (Optional) Watering Frequency (days):
     <input type="number" id="wateringFrequency" placeholder="Default: 2" min="1" />
   </label>
 
   <label>
-    (Optional) ET Replacement Percentage (%):
+    (Optional) ET Replacement (%):
     <input type="number" id="etReplacement" placeholder="Default: 75" min="0" max="100" />
   </label>
 
   <label>
-    (Optional) Runtime Formula Override:
+    (Optional) Formula Override:
     <input type="text" id="formulaInput" placeholder="Default: (W / 7) * (ET * 0.75 - R) * Rate" />
   </label>
 
   <div id="sprinklerZones">
     <div class="labels-row">
       <div class="zone-name">Sprinkler Zone Name</div>
-      <div class="zone-rate">Runtime per 1" (minutes)</div>
+      <div class="zone-rate">Minutes per 1"</div>
       <div style="width: 32px;"></div>
     </div>
   </div>
@@ -251,6 +196,7 @@
 <script>
   const zonesContainer = document.getElementById("sprinklerZones");
   const resultsDiv = document.getElementById("results");
+  const suggestionsDiv = document.getElementById("suggestions");
   let selectedCoords = null;
 
   function addZone(name = "", rate = "") {
@@ -259,149 +205,135 @@
     div.innerHTML = `
       <input type="text" class="zone-name" placeholder="Zone name" value="${name}" />
       <input type="number" class="zone-rate" min="0" placeholder="Minutes per 1 inch" value="${rate}" />
-      <button type="button" title="Remove zone">×</button>
+      <button type="button">×</button>
     `;
     div.querySelector("button").onclick = () => div.remove();
     zonesContainer.appendChild(div);
   }
   addZone();
+  document.getElementById("addZoneBtn").onclick = () => addZone();
 
-  document.getElementById("addZoneBtn").addEventListener("click", () => addZone());
-
-  function isAddress(query) {
-    return /^\d+/.test(query.trim()) || /\b(st|street|rd|road|ave|avenue|blvd|drive|dr|ln|lane)\b/i.test(query);
+  function looksLikeAddress(q) {
+    return /^\d/.test(q.trim()) || /\b(st|street|rd|road|ave|avenue|blvd|drive|dr|lane|ln)\b/i.test(q);
   }
 
-  function formatLocation(item, isAddr) {
-    const addr = item.address;
-    if (isAddr) {
-      return item.display_name;
-    }
-    const city = addr.city || addr.town || addr.village || addr.hamlet || "";
+  function formatSuggestion(item, isAddress) {
+    const addr = item.address || {};
+    if (isAddress) return item.display_name;
+    const city = addr.city || addr.town || addr.village || "";
     const state = addr.state || "";
-    const country = addr.country || "";
-    return [city, state, country].filter(Boolean).join(", ");
+    const postcode = addr.postcode || "";
+    return [city, state, postcode].filter(s => s).join(", ");
   }
 
   async function searchLocation(query) {
     if (query.length < 2) {
-      document.getElementById("suggestions").style.display = "none";
+      suggestionsDiv.style.display = "none";
       return;
     }
-    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=us&q=${encodeURIComponent(query)}`;
-    const resp = await fetch(url);
-    if (!resp.ok) return;
-    const data = await resp.json();
-    const suggestionsDiv = document.getElementById("suggestions");
-    suggestionsDiv.innerHTML = "";
-    const addrMode = isAddress(query);
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.textContent = formatLocation(item, addrMode);
-      div.onclick = () => {
-        document.getElementById("locationInput").value = formatLocation(item, addrMode);
-        selectedCoords = { lat: parseFloat(item.lat), lon: parseFloat(item.lon) };
-        suggestionsDiv.style.display = "none";
-      };
-      suggestionsDiv.appendChild(div);
-    });
-    suggestionsDiv.style.display = data.length ? "block" : "none";
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=us&q=${encodeURIComponent(query)}`;
+      const resp = await fetch(url);
+      const data = resp.ok ? await resp.json() : [];
+      suggestionsDiv.innerHTML = "";
+      const isAddr = looksLikeAddress(query);
+      data.forEach(item => {
+        const div = document.createElement("div");
+        div.textContent = formatSuggestion(item, isAddr);
+        div.onclick = () => {
+          document.getElementById("locationInput").value = formatSuggestion(item, isAddr);
+          selectedCoords = { lat: parseFloat(item.lat), lon: parseFloat(item.lon) };
+          suggestionsDiv.style.display = "none";
+        };
+        suggestionsDiv.appendChild(div);
+      });
+      suggestionsDiv.style.display = data.length ? "block" : "none";
+    } catch {
+      suggestionsDiv.style.display = "none";
+    }
   }
 
   document.getElementById("locationInput").addEventListener("input", e => {
     selectedCoords = null;
     searchLocation(e.target.value);
   });
-
   document.addEventListener("click", e => {
-    if (!document.getElementById("locationInput").contains(e.target) &&
-        !document.getElementById("suggestions").contains(e.target)) {
-      document.getElementById("suggestions").style.display = "none";
+    if (!document.getElementById("locationInput").contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.style.display = "none";
     }
   });
 
-  document.getElementById("locationBtn").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported.");
-      return;
-    }
+  document.getElementById("locationBtn").onclick = () => {
+    if (!navigator.geolocation) return alert("Geolocation not supported.");
     navigator.geolocation.getCurrentPosition(async pos => {
       const lat = pos.coords.latitude.toFixed(4);
       const lon = pos.coords.longitude.toFixed(4);
       document.getElementById("latitude").value = lat;
       document.getElementById("longitude").value = lon;
       selectedCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
-      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&countrycodes=us`);
-      const data = await resp.json();
-      const addrMode = isAddress(data.display_name);
-      document.getElementById("locationInput").value = formatLocation(data, addrMode);
+      try {
+        const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${lat}&lon=${lon}&countrycodes=us`);
+        if (!resp.ok) throw new Error();
+        const data = await resp.json();
+        const isAddr = looksLikeAddress(data.display_name || "");
+        document.getElementById("locationInput").value = formatSuggestion(data, isAddr);
+      } catch {
+        // No fallback changes needed
+      }
     }, err => alert("Location error: " + err.message));
-  });
+  };
 
-  function sumArray(arr) {
-    return arr.reduce((a, b) => a + b, 0);
-  }
-
+  function sumArray(arr) { return arr.reduce((a, b) => a + b, 0); }
   function formatMinutes(mins) {
     if (mins <= 0) return "0 min";
-    let hrs = Math.floor(mins / 60);
-    let minutes = Math.round(mins % 60);
-    return hrs > 0 ? `${hrs} hr ${minutes} min` : `${minutes} min`;
+    const hrs = Math.floor(mins / 60), minsOnly = Math.round(mins % 60);
+    return hrs > 0 ? `${hrs} hr ${minsOnly} min` : `${minsOnly} min`;
   }
-
   async function fetchWeatherData(lat, lon) {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
-    const resp = await fetch(url);
+    const endpoint = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
+    const resp = await fetch(endpoint);
     if (!resp.ok) throw new Error("Weather fetch failed");
-    return resp.json();
+    return await resp.json();
   }
 
   function evaluateFormula(formula, vars) {
     try {
       let exp = formula;
-      for (const [key, val] of Object.entries(vars)) {
-        exp = exp.replace(new RegExp(`\\b${key}\\b`, "g"), val);
+      for (const [k, v] of Object.entries(vars)) {
+        exp = exp.replace(new RegExp(`\\b${k}\\b`, "g"), v);
       }
-      if (!/^[0-9+\-*/().\s]+$/.test(exp)) throw new Error("Invalid characters in formula.");
-      return Function(`"use strict";return (${exp})`)();
+      if (!/^[0-9+\-*/().\s]+$/.test(exp)) throw new Error("Invalid characters");
+      return Function(`"use strict"; return (${exp})`)();
     } catch {
       throw new Error("Formula evaluation failed.");
     }
   }
 
-  document.getElementById("calculateBtn").addEventListener("click", async () => {
+  document.getElementById("calculateBtn").onclick = async () => {
     resultsDiv.style.display = "block";
     resultsDiv.textContent = "Fetching weather data...";
-
     let lat = parseFloat(document.getElementById("latitude").value);
     let lon = parseFloat(document.getElementById("longitude").value);
-
     if (!selectedCoords && (isNaN(lat) || isNaN(lon))) {
-      resultsDiv.textContent = "Please enter a location or latitude/longitude.";
-      return;
+      return resultsDiv.textContent = "Please enter a location or latitude/longitude.";
     }
     if (selectedCoords) {
       lat = selectedCoords.lat;
       lon = selectedCoords.lon;
     }
-
     let W = parseFloat(document.getElementById("wateringFrequency").value);
     if (isNaN(W) || W <= 0) W = 2;
-
     let ETrepl = parseFloat(document.getElementById("etReplacement").value);
     if (isNaN(ETrepl) || ETrepl < 0 || ETrepl > 100) ETrepl = 75;
     ETrepl = ETrepl / 100;
-
     const formulaRaw = document.getElementById("formulaInput").value.trim();
     const formula = formulaRaw || "(W / 7) * (ET * ETrepl - R) * Rate";
-
     const zones = [];
     for (const row of zonesContainer.querySelectorAll(".zone-row")) {
       const name = row.querySelector(".zone-name").value.trim();
       const rate = parseFloat(row.querySelector(".zone-rate").value);
       if (!name || isNaN(rate) || rate < 0) {
-        resultsDiv.textContent = "Please enter valid zone names and runtimes.";
-        return;
+        return resultsDiv.textContent = "Please enter valid zone names and runtimes.";
       }
       zones.push({ name, rate });
     }
@@ -410,26 +342,21 @@
       const data = await fetchWeatherData(lat, lon);
       const weeklyRainfall = sumArray(data.daily.precipitation_sum);
       const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
-      const resultLines = zones.map(({ name, rate }) => {
-        try {
-          let runtime = evaluateFormula(formula, { W, ET: weeklyET, R: weeklyRainfall, Rate: rate, ETrepl });
-          if (runtime < 0) runtime = 0;
-          return `${name}: ${formatMinutes(runtime)}`;
-        } catch (err) {
-          resultsDiv.textContent = err.message;
-          throw err;
-        }
+      const lines = zones.map(({ name, rate }) => {
+        let runtime = evaluateFormula(formula, { W, ET: weeklyET, R: weeklyRainfall, Rate: rate, ETrepl });
+        if (runtime < 0) runtime = 0;
+        return `${name}: ${formatMinutes(runtime)}`;
       });
-
-      resultsDiv.innerHTML =
-        `<strong>Weekly ET:</strong> ${weeklyET.toFixed(3)} in<br>` +
-        `<strong>7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>` +
-        `<strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>` +
-        resultLines.join("<br>");
-    } catch (error) {
-      resultsDiv.textContent = `Error: ${error.message}`;
+      resultsDiv.innerHTML = `
+        <strong>Weekly ET:</strong> ${weeklyET.toFixed(3)} in<br>
+        <strong>7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>
+        <strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>
+        ${lines.join("<br>")}
+      `;
+    } catch (err) {
+      resultsDiv.textContent = `Error: ${err.message}`;
     }
-  });
+  };
 </script>
 </body>
 </html>
