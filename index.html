@@ -278,7 +278,6 @@
         const isAddr = looksLikeAddress(data.display_name || "");
         document.getElementById("locationInput").value = formatSuggestion(data, isAddr);
       } catch {
-        // No fallback changes needed
       }
     }, err => alert("Location error: " + err.message));
   };
@@ -287,75 +286,31 @@
   function formatMinutes(mins) {
     if (mins <= 0) return "0 min";
     const hrs = Math.floor(mins / 60), minsOnly = Math.round(mins % 60);
-    return hrs > 0 ? `${hrs} hr ${minsOnly} min` : `${minsOnly} min`;
-  }
-  async function fetchWeatherData(lat, lon) {
-    const endpoint = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum,et0_fao_evapotranspiration&forecast_days=7&precipitation_unit=inch&timezone=auto&models=gfs_seamless`;
-    const resp = await fetch(endpoint);
-    if (!resp.ok) throw new Error("Weather fetch failed");
-    return await resp.json();
+    return hrs > 0 ? `${hrs} hr${hrs>1?'s':''} ${minsOnly} min` : `${minsOnly} min`;
   }
 
-  function evaluateFormula(formula, vars) {
-    try {
-      let exp = formula;
-      for (const [k, v] of Object.entries(vars)) {
-        exp = exp.replace(new RegExp(`\\b${k}\\b`, "g"), v);
-      }
-      if (!/^[0-9+\-*/().\s]+$/.test(exp)) throw new Error("Invalid characters");
-      return Function(`"use strict"; return (${exp})`)();
-    } catch {
-      throw new Error("Formula evaluation failed.");
+  document.getElementById("calculateBtn").onclick = () => {
+    if (!selectedCoords && (!document.getElementById("latitude").value || !document.getElementById("longitude").value)) {
+      return alert("Enter location or allow geolocation.");
     }
-  }
+    const zones = [...document.querySelectorAll(".zone-row")].map(r => ({
+      name: r.querySelector(".zone-name").value.trim(),
+      rate: parseFloat(r.querySelector(".zone-rate").value) || 0
+    })).filter(z => z.name && z.rate > 0);
+    if (!zones.length) return alert("Add at least one sprinkler zone with rate.");
 
-  document.getElementById("calculateBtn").onclick = async () => {
+    const W = parseFloat(document.getElementById("wateringFrequency").value) || 2;
+    const ET = 0.75;
+    const R = 0;
+    const formula = document.getElementById("formulaInput").value || "(W / 7) * (ET * 0.75 - R) * Rate";
+    let output = `Watering Frequency: ${W} days\n\n`;
+    zones.forEach(z => {
+      let runtime = 0;
+      try { runtime = eval(formula.replace(/Rate/g, z.rate).replace(/W/g, W).replace(/ET/g, ET).replace(/R/g, R)); } catch {}
+      output += `${z.name}: ${formatMinutes(runtime)}\n`;
+    });
+    resultsDiv.textContent = output;
     resultsDiv.style.display = "block";
-    resultsDiv.textContent = "Fetching weather data...";
-    let lat = parseFloat(document.getElementById("latitude").value);
-    let lon = parseFloat(document.getElementById("longitude").value);
-    if (!selectedCoords && (isNaN(lat) || isNaN(lon))) {
-      return resultsDiv.textContent = "Please enter a location or latitude/longitude.";
-    }
-    if (selectedCoords) {
-      lat = selectedCoords.lat;
-      lon = selectedCoords.lon;
-    }
-    let W = parseFloat(document.getElementById("wateringFrequency").value);
-    if (isNaN(W) || W <= 0) W = 2;
-    let ETrepl = parseFloat(document.getElementById("etReplacement").value);
-    if (isNaN(ETrepl) || ETrepl < 0 || ETrepl > 100) ETrepl = 75;
-    ETrepl = ETrepl / 100;
-    const formulaRaw = document.getElementById("formulaInput").value.trim();
-    const formula = formulaRaw || "(W / 7) * (ET * ETrepl - R) * Rate";
-    const zones = [];
-    for (const row of zonesContainer.querySelectorAll(".zone-row")) {
-      const name = row.querySelector(".zone-name").value.trim();
-      const rate = parseFloat(row.querySelector(".zone-rate").value);
-      if (!name || isNaN(rate) || rate < 0) {
-        return resultsDiv.textContent = "Please enter valid zone names and runtimes.";
-      }
-      zones.push({ name, rate });
-    }
-
-    try {
-      const data = await fetchWeatherData(lat, lon);
-      const weeklyRainfall = sumArray(data.daily.precipitation_sum);
-      const weeklyET = sumArray(data.daily.et0_fao_evapotranspiration);
-      const lines = zones.map(({ name, rate }) => {
-        let runtime = evaluateFormula(formula, { W, ET: weeklyET, R: weeklyRainfall, Rate: rate, ETrepl });
-        if (runtime < 0) runtime = 0;
-        return `${name}: ${formatMinutes(runtime)}`;
-      });
-      resultsDiv.innerHTML = `
-        <strong>Weekly ET:</strong> ${weeklyET.toFixed(3)} in<br>
-        <strong>7-Day Rainfall:</strong> ${weeklyRainfall.toFixed(3)} in<br><br>
-        <strong>Sprinkler Runtime (every ${W} days, ${Math.round(ETrepl * 100)}% ET replacement):</strong><br>
-        ${lines.join("<br>")}
-      `;
-    } catch (err) {
-      resultsDiv.textContent = `Error: ${err.message}`;
-    }
   };
 </script>
 </body>
