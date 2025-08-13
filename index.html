@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z"/><ellipse cx="16" cy="22" rx="7" ry="7" fill="white" fill-opacity="0.5"/></svg>'>
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-2[...]'>
 <title>Sprinkler Runtime Calculator</title>
 <style>
   body {
@@ -162,6 +162,17 @@
       margin-top: 0.25rem;
     }
   }
+  .required {
+    color: #c00;
+    font-weight: normal;
+    font-size: 0.95em;
+    margin-left: 0.2em;
+  }
+  .location-note {
+    font-size: 0.95em;
+    color: #555;
+    margin: 0.25em 0 1em 0;
+  }
 </style>
 </head>
 <body>
@@ -181,22 +192,31 @@
     <br/>
     <code>Rate</code> = minutes to irrigate 1" water for your sprinklers
     <br/><br/>
-    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (the default values and formula calculate runtime to replace 75% weekly ET by watering every 2 days like so:
+    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code> (the default values and formula calcula[...]
     <br/><br/>
     <code> (W / 7) * (ET * 0.75 - R) * Rate</code>).
   </p>
 
-  <label>
-    Latitude:
-    <input type="number" id="latitude" placeholder="Enter latitude (e.g., 47.94)" step="0.0001" />
-  </label>
-
-  <label>
-    Longitude:
-    <input type="number" id="longitude" placeholder="Enter longitude (e.g., -122.21)" step="0.0001" />
-  </label>
-
-  <button id="locationBtn" type="button">Use My Current Location</button>
+  <div>
+    <label>
+      Location <span class="required">*</span>:
+    </label>
+    <span class="location-note">Enter either a U.S. ZIP code <strong>or</strong> latitude/longitude.</span>
+    <label>
+      ZIP Code:
+      <input type="text" id="zipcode" placeholder="e.g., 98052" pattern="[0-9]{5}" maxlength="5" inputmode="numeric" autocomplete="postal-code"/>
+    </label>
+    <span style="display:block; margin: 0.5em 0; text-align: center; color: #888;">— or —</span>
+    <label>
+      Latitude:
+      <input type="number" id="latitude" placeholder="Enter latitude (e.g., 47.94)" step="0.0001" />
+    </label>
+    <label>
+      Longitude:
+      <input type="number" id="longitude" placeholder="Enter longitude (e.g., -122.21)" step="0.0001" />
+    </label>
+    <button id="locationBtn" type="button">Use My Current Location (Auto-fills ZIP & coordinates)</button>
+  </div>
 
   <div id="sprinklerZones">
     <div class="labels-row">
@@ -236,7 +256,9 @@
 <script>
   const zonesContainer = document.getElementById("sprinklerZones");
   const resultsDiv = document.getElementById("results");
-  const defaultFormula = "(W / 7) * (ET * ETrepl - R) * Rate";
+  const zipcodeInput = document.getElementById("zipcode");
+  const latInput = document.getElementById("latitude");
+  const lonInput = document.getElementById("longitude");
 
   // Add a sprinkler zone input row
   function addZone(name = "", rate = "") {
@@ -255,16 +277,33 @@
   // Start with one empty zone on page load
   addZone();
 
-  // Location button
-  document.getElementById("locationBtn").addEventListener("click", () => {
+  // Location button - get user's current location, then reverse geocode to ZIP
+  document.getElementById("locationBtn").addEventListener("click", async () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        document.getElementById("latitude").value = pos.coords.latitude.toFixed(4);
-        document.getElementById("longitude").value = pos.coords.longitude.toFixed(4);
+      async (pos) => {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lon = pos.coords.longitude.toFixed(4);
+        latInput.value = lat;
+        lonInput.value = lon;
+
+        // Try to reverse geocode to ZIP code using Nominatim
+        let zip = "";
+        try {
+          const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&addressdetails=1`);
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.address && data.address.postcode) {
+              zip = data.address.postcode.match(/^\d{5}/) ? data.address.postcode.substring(0, 5) : "";
+              zipcodeInput.value = zip;
+            }
+          }
+        } catch (e) {
+          // If reverse geocode fails, leave ZIP blank
+        }
       },
       (err) => alert("Could not get location: " + err.message)
     );
@@ -300,16 +339,27 @@
     return resp.json();
   }
 
+  // Get lat/lon for a zipcode using Nominatim
+  async function getLatLonFromZip(zip) {
+    // Nominatim limits: 1 request/sec for fair use
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=us&format=jsonv2&limit=1`);
+    if (!resp.ok) throw new Error("Failed to look up ZIP code location");
+    const data = await resp.json();
+    if (!data || !data.length) throw new Error("Could not find location for ZIP code");
+    return {
+      lat: parseFloat(data[0].lat),
+      lon: parseFloat(data[0].lon)
+    };
+  }
+
   // Evaluate formula safely with user input
   function evaluateFormula(formula, vars) {
     try {
-      // Replace variable names with values in formula string
       let exp = formula;
       for (const [key, val] of Object.entries(vars)) {
         const regex = new RegExp(`\\b${key}\\b`, "g");
         exp = exp.replace(regex, val);
       }
-      // Basic validation to allow only numbers and math operators
       if (!/^[0-9+\-*/().\s]+$/.test(exp)) {
         throw new Error("Invalid characters in formula.");
       }
@@ -320,16 +370,54 @@
     }
   }
 
-  // Calculate button
+  // Validate that either ZIP or both lat/lon are entered
+  function getUserLocationInput() {
+    const zip = zipcodeInput.value.trim();
+    const latVal = latInput.value.trim();
+    const lonVal = lonInput.value.trim();
+
+    if (zip && zip.match(/^\d{5}$/)) {
+      // Prefer ZIP, ignore lat/lon unless user enters both and not zip
+      return { mode: "zip", zip };
+    }
+    if (latVal && lonVal && !zip) {
+      const lat = parseFloat(latVal);
+      const lon = parseFloat(lonVal);
+      if (!isNaN(lat) && !isNaN(lon)) {
+        return { mode: "latlon", lat, lon };
+      }
+    }
+    // If neither, error
+    return null;
+  }
+
   document.getElementById("calculateBtn").addEventListener("click", async () => {
     resultsDiv.style.display = "block";
-    resultsDiv.textContent = "Fetching weather data...";
+    resultsDiv.textContent = "Validating location input...";
 
-    const lat = parseFloat(document.getElementById("latitude").value);
-    const lon = parseFloat(document.getElementById("longitude").value);
-    if (isNaN(lat) || isNaN(lon)) {
-      resultsDiv.textContent = "Please enter valid latitude and longitude.";
+    // Location logic
+    const loc = getUserLocationInput();
+    let lat, lon;
+    if (!loc) {
+      resultsDiv.textContent = "Please enter a valid ZIP code (5 digits) or both latitude and longitude.";
       return;
+    }
+    if (loc.mode === "zip") {
+      try {
+        resultsDiv.textContent = "Looking up ZIP code location...";
+        const res = await getLatLonFromZip(loc.zip);
+        lat = res.lat;
+        lon = res.lon;
+        // Also fill lat/lon fields for clarity
+        latInput.value = lat.toFixed(4);
+        lonInput.value = lon.toFixed(4);
+      } catch (e) {
+        resultsDiv.textContent = "Could not find latitude/longitude for ZIP code: " + e.message;
+        return;
+      }
+    } else if (loc.mode === "latlon") {
+      lat = loc.lat;
+      lon = loc.lon;
     }
 
     let W = parseFloat(document.getElementById("wateringFrequency").value);
@@ -357,6 +445,7 @@
     }
 
     try {
+      resultsDiv.textContent = "Fetching weather data...";
       const data = await fetchWeatherData(lat, lon);
 
       if (!data.daily || !data.daily.precipitation_sum || !data.daily.et0_fao_evapotranspiration) {
@@ -369,7 +458,6 @@
 
       // Calculate runtimes
       const resultLines = zones.map(({ name, rate }) => {
-        // Prepare vars for formula
         const vars = {
           W,
           ET: weeklyET,
@@ -399,7 +487,22 @@
       }
     }
   });
+
+  // If user enters ZIP, clear lat/lon; if user enters lat/lon, clear ZIP (for clarity)
+  zipcodeInput.addEventListener("input", function() {
+    if (zipcodeInput.value.trim().length === 5) {
+      latInput.value = "";
+      lonInput.value = "";
+    }
+  });
+  function clearZipIfLatLon() {
+    if (latInput.value.trim() && lonInput.value.trim()) {
+      zipcodeInput.value = "";
+    }
+  }
+  latInput.addEventListener("input", clearZipIfLatLon);
+  lonInput.addEventListener("input", clearZipIfLatLon);
+
 </script>
 </body>
 </html>
-
