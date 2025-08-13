@@ -197,21 +197,6 @@
 
   <button id="locationBtn" type="button">Use My Current Location</button>
 
-  <label>
-    (Optional) Watering Frequency (every X days):
-    <input type="number" id="wateringFrequency" placeholder="Default: 2 (water every 2 days)" min="1" />
-  </label>
-
-  <label>
-    (Optional) ET Replacement Percentage (%):
-    <input type="number" id="etReplacement" placeholder="Default: 75 for 75%" min="0" max="100" />
-  </label>
-
-  <label>
-    (Optional) Runtime Formula Override:
-    <input type="text" id="formulaInput" placeholder="Default: (W / 7) * (ET * 0.75 - R) * Rate" />
-  </label>
-
   <div id="sprinklerZones">
     <div class="labels-row">
       <div class="zone-name">Sprinkler Zone Name</div>
@@ -222,6 +207,26 @@
   </div>
 
   <button id="addZoneBtn" type="button">+ Add Sprinkler Zone</button>
+
+  <label>
+    Optional:
+  </label>
+  <br/>
+  <label>
+    Watering Frequency (every X days):
+    <input type="number" id="wateringFrequency" placeholder="Default: 2 (water every 2 days)" min="1" />
+  </label>
+
+  <label>
+    ET Replacement Percentage (%):
+    <input type="number" id="etReplacement" placeholder="Default: 75 for 75%" min="0" max="100" />
+  </label>
+
+  <label>
+    Runtime Formula Override:
+    <input type="text" id="formulaInput" placeholder="Default: (W / 7) * (ET * 0.75 - R) * Rate" />
+  </label>
+  
   <button id="calculateBtn" type="button">Calculate Runtime</button>
 
   <div id="results" style="display:none;"></div>
