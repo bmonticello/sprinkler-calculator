@@ -28,17 +28,11 @@ body {
     margin-bottom: 1.5rem;
     line-height: 1.4;
   }
-
-  /* Lay out each label as: [label text][fixed-width input], so inputs align */
   label {
-    display: grid;
-    grid-template-columns: max-content 16rem; /* input column width */
-    column-gap: 0.5rem;                       /* space between text and input */
-    align-items: center;
+    display: block;
     margin-top: 1rem;
     font-weight: bold;
   }
-
   input[type="number"], input[type="text"] {
     padding: 0.6rem;
     font-size: 1rem;
@@ -48,22 +42,6 @@ body {
     border-radius: 6px;
     box-sizing: border-box;
   }
-
-  /* Make inputs inside labels fill the input column and align their right edges */
-  label > input[type="text"],
-  label > input[type="number"],
-  label > input[type="email"],
-  label > input[type="search"],
-  label > input[type="url"],
-  label > textarea,
-  label > select {
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 0;       /* override the generic input top margin */
-    justify-self: end;   /* align the input box to the right of its grid column */
-    text-align: right;   /* also right-align the text inside (optional) */
-  }
-
   #sprinklerZones {
     margin-top: 1rem;
     background: #f9fafb;
@@ -169,7 +147,6 @@ body {
   .labels-row > div.zone-rate {
     flex: 1;
   }
-
   @media (max-width: 480px) {
     .zone-row, .labels-row {
       flex-direction: column;
@@ -183,23 +160,7 @@ body {
       font-size: 1.5rem;
       margin-top: 0.25rem;
     }
-    /* Stack label text above input on small screens */
-    label {
-      grid-template-columns: 1fr;
-      row-gap: 0.25rem;
-    }
-    label > input[type="text"],
-    label > input[type="number"],
-    label > input[type="email"],
-    label > input[type="search"],
-    label > input[type="url"],
-    label > textarea,
-    label > select {
-      justify-self: stretch;
-      text-align: right;
-    }
   }
-
   .required {
     color: #c00;
     font-weight: normal;
