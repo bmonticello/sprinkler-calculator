@@ -111,6 +111,7 @@
   color: var(--link-hover);
   background: var(--active-bg);
 }
+.primary-nav { display: block; }
 
 /* Toggle button */
 .nav-toggle {
