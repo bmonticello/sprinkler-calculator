@@ -10,6 +10,30 @@
 </head>
 <body>
 <div id="container">
+  <!-- Site navigation header -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <a class="brand" href="/">Sprinkler Calculator</a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
+        <span class="sr-only">Open menu</span>
+        <svg class="icon icon-menu" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon icon-close" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="/" aria-current="page">Home</a></li>
+          <li><a href="/pages/about.html">About</a></li>
+          <li><a href="/pages/privacy.html">Privacy</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
   <h1 id="pageTop">Sprinkler Runtime Calculator</h1>
   <br/>
   <p class="description">
