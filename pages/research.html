@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z"/><ellipse cx="16" cy="22" rx="7" ry="7" fill="white" fill-opacity="0.5"/></svg>'>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4567620933790706" crossorigin="anonymous"></script>
-  <title>How This Calculator Works: Easy Guide to Smarter Lawn Watering</title>
+  <title>How It Works - Sprinkler Runtime Calculator</title>
   <meta name="description" content="An easy, research-backed explanation of how SprinklerCalculator.com converts weather, rainfall, and your sprinkler output into minutes per zone—helping homeowners save water and keep lawns healthy.">
   <link rel="stylesheet" href="../css/header.css">
   <link rel="stylesheet" href="../css/styles.css">
@@ -109,26 +110,14 @@
     <!-- Page content -->
     <div class="research">
       <h1>How This Calculator Works</h1>
-      <p class="small">A simple, research‑based way to figure out exactly how many minutes to run each sprinkler zone—so you save water, money, and keep your lawn green.</p>
+      <p class="small">A simple, research‑based way to figure out exactly how many minutes to run each of your sprinkler zones—so you save water, money, and keep your lawn green.</p>
 
       <div class="note">
         <strong>In short:</strong> We look at how much water your grass actually needs based on the weather (FAO‑56 Penman–Monteith ET), subtract effective rainfall, and translate what’s left into minutes using your system’s output rate. This gives you right‑sized runtimes per zone.
       </div>
 
-      <h2>The Exact Formula Used</h2>
-      <p>The calculator uses the following formula to determine runtime per irrigation event:</p>
-      <pre><code>Runtime (minutes) = (W ÷ 7) × (ET × 0.75 − R) × Rate</code></pre>
-      <ul>
-        <li><strong>W</strong> = watering frequency in days (e.g., water every 3 days)</li>
-        <li><strong>ET</strong> = weekly evapotranspiration in inches for your location</li>
-        <li><strong>R</strong> = weekly total rainfall in inches for your location</li>
-        <li><strong>Rate</strong> = minutes it takes your sprinklers to apply 1 inch of water</li>
-      </ul>
-      <p><strong>Plain English version:</strong><br>
-      Start with how much water the weather says your lawn used this week, take 75% of that amount (since most lawns do well without replacing 100%), subtract the rainfall, adjust based on how often you water, and then convert inches into minutes with your system’s rate.</p>
-
       <h2>1) Weather Tells Us How Thirsty Your Grass Is</h2>
-      <p>Grass loses water each day through heat, sun, and wind. Scientists call this <em>ET</em> (short for evapotranspiration). Public weather networks publish ET values so we know how much water grass used in your area.</p>
+      <p>Grass loses water each day through heat, sun, and wind. Scientists call this <em>ET</em> (short for evapotranspiration). Public weather networks publish ET values so we know how much water grass loses in your area.</p>
       <p>Studies show you don’t need to replace 100% of that water to keep a healthy lawn. Most home lawns look great with <strong>about 70–80%</strong> of ET replaced in summer, and 60–70% in spring/fall. We default to <strong>75%</strong> as a practical, water‑saving baseline.</p>
 
       <h2>2) Giving Credit for Rainfall</h2>
@@ -142,10 +131,15 @@
       </ul>
 
       <h2>4) Putting It All Together</h2>
+      <p>The calculator uses the following formula to determine runtime per irrigation event:</p>
+      <pre><code>Runtime (minutes) = (W ÷ 7) × (ET × 0.75 − R) × Rate</code></pre>
+      <ul>
+        <li><strong>W</strong> = watering frequency in days (e.g., water every 3 days)</li>
+        <li><strong>ET</strong> = weekly evapotranspiration in inches for your location</li>
+        <li><strong>R</strong> = weekly total rainfall in inches for your location</li>
+        <li><strong>Rate</strong> = minutes it takes your sprinklers to apply 1 inch of water</li>
+      </ul>
       <p>Following this formula, the result is the number of minutes per zone you should run your sprinklers. If that time is long, split it into two or three shorter “cycle‑and‑soak” sessions to reduce runoff and improve absorption.</p>
-
-      <h2>Example</h2>
-      <p>Let’s say the weather shows your lawn used about 1.1 inches of water this week. Multiply that by 0.75 (75% replacement) = 0.83 inches. It rained 0.1 inch, leaving 0.73 inches still needed. If your system applies 1 inch in 60 minutes and you water every 3 days (W = 3), then per watering: (3 ÷ 7) × 0.73 × 60 ≈ <strong>19 minutes</strong>.</p>
 
       <h2>Why This Works</h2>
       <p>This approach is backed by decades of turfgrass and irrigation research. Universities and organizations like the Irrigation Association and EPA WaterSense recommend weather‑based irrigation with appropriate deficits to maintain healthy turf while conserving water.</p>
