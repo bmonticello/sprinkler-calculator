@@ -33,6 +33,7 @@
       lastFocused = document.activeElement;
       toggle.setAttribute("aria-expanded", "true");
       document.body.classList.add("nav-open");
+      nav.classList.add("open"); // <-- ensure visible with styles.css
       if (overlay) overlay.removeAttribute("hidden");
       // Move focus into the menu (first link)
       safeFocus(firstNavLink);
@@ -42,6 +43,7 @@
       if (!toggle || !nav) return;
       toggle.setAttribute("aria-expanded", "false");
       document.body.classList.remove("nav-open");
+      nav.classList.remove("open"); // <-- hide again
       if (overlay) overlay.setAttribute("hidden", "");
       // Return focus to the toggle (or last focused element)
       if (lastFocused && typeof lastFocused.focus === "function") {
@@ -116,7 +118,7 @@
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    // Improve aria-current if paths match (best-effort)
+    // Best-effort aria-current
     try {
       const links = nav ? nav.querySelectorAll("a[href]") : null;
       const loc = window.location;
@@ -124,14 +126,12 @@
       const setAria = (a) => {
         const href = a.getAttribute("href");
         if (!href) return;
-        // Normalize trailing slash for home
         const isHome = href === "/" || href.slice(-11) === "/index.html";
         const onHome = loc.pathname === "/" || loc.pathname.slice(-11) === "/index.html";
         if (isHome && onHome) {
           a.setAttribute("aria-current", "page");
           return;
         }
-        // For other pages, exact end match
         if (href !== "/" && loc.pathname.slice(-href.length) === href) {
           a.setAttribute("aria-current", "page");
         }
