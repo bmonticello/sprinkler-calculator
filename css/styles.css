@@ -6,7 +6,6 @@ body {
     padding: 2rem;
     display: flex;
     justify-content: center;
-    min-height: 100vh;
   }
   #container {
     max-width: 645px;
