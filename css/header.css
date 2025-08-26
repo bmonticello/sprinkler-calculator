@@ -51,16 +51,9 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--header-border);
-  /* Explicitly no shadow when not scrolled */
-  box-shadow: none;
   transition: background .25s ease, box-shadow .25s ease, transform .2s ease;
-
-  /* Match container’s rounded corners (8px) and clip backdrop to radius */
-  border-radius: 8px;
-  overflow: hidden;
 }
 .site-header.scrolled {
-  /* Same bottom-oriented shadow as currently used when scrolled */
   box-shadow: var(--shadow);
   background: color-mix(in oklab, white 82%, transparent);
 }
