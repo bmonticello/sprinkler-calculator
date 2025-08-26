@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How This Calculator Works: Easy Guide to Smarter Lawn Watering</title>
+  <meta name="description" content="An easy, research-backed explanation of how SprinklerCalculator.com converts weather, rainfall, and your sprinkler output into minutes per zone—helping homeowners water lawns efficiently." />
+  <style>
+    :root { --bg:#0e1116; --card:#ffffff; --ink:#1f2937; --muted:#6b7280; --accent:#0ea5e9; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;}
+    .wrap{max-width:980px;margin:0 auto;padding:28px;}
+    .card{background:var(--card);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:28px;}
+    h1{font-size:2rem;margin:0 0 10px;}
+    h2{margin-top:32px;border-top:1px solid #eef2f7;padding-top:28px;font-size:1.4rem}
+    p,li{line-height:1.65}
+    .note{background:#f1f8ff;border-left:4px solid var(--accent);padding:12px 14px;border-radius:8px;margin:16px 0;color:#0b3b58}
+    .callout{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-top:14px}
+    .refs li{margin-bottom:.6rem}
+    .small{color:var(--muted);font-size:.95rem}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    pre{background:#f8fafc;padding:12px;border-radius:8px;overflow-x:auto}
+    code{font-family:ui-monospace,monospace}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>How This Calculator Works</h1>
+      <p class="small">A simple, research‑based way to figure out exactly how many minutes to run each sprinkler zone—so you save water, money, and keep your lawn green.</p>
+
+      <div class="note">
+        <strong>In short:</strong> We look at how much water your grass actually needs based on the weather (<a href="https://www.fao.org/4/x5560e/x5560e00.htm" target="_blank">FAO‑56 Penman–Monteith method</a>), subtract the rain it already got (<a href="https://www.fao.org/4/x5560e/x5560e03.htm" target="_blank">effective rainfall guidelines</a>), and then figure out how long your sprinklers should run based on how fast they apply water (<a href="https://www.rainbird.com/professionals/irrigation-design-tip-calculating-precipitation-rates" target="_blank">precipitation rate</a>).
+      </div>
+
+      <h2>The Exact Formula Used</h2>
+      <p>The calculator uses the following formula to determine runtime per irrigation event:</p>
+      <pre><code>Runtime (minutes) = (W ÷ 7) × (ET × 0.75 − R) × Rate</code></pre>
+      <ul>
+        <li><strong>W</strong> = watering frequency in days (e.g., water every 3 days)</li>
+        <li><strong>ET</strong> = weekly evapotranspiration in inches for your location</li>
+        <li><strong>R</strong> = weekly total rainfall in inches for your location</li>
+        <li><strong>Rate</strong> = minutes it takes your sprinklers to apply 1 inch of water</li>
+      </ul>
+      <p><strong>Plain English version:</strong><br>
+      Start with how much water the weather says your lawn used this week, take 75% of that amount (since most lawns do well without replacing 100%), subtract the rainfall, adjust based on how often you water, and multiply by how long it takes your sprinklers to apply an inch of water. That gives you the number of minutes to run each zone.</p>
+
+      <h2>1) Weather Tells Us How Thirsty Your Grass Is</h2>
+      <p>Grass loses water each day through heat, sun, and wind. Scientists call this <em>ET</em> (short for evapotranspiration). Public weather networks publish ET values so we know how much water grass would use in a week (<a href="https://www.mesonet.org/images/site/ASCE_Evapotranspiration_Formula.pdf" target="_blank">ASCE Standardized ET Equation</a>).</p>
+      <p>Studies show you don’t need to replace 100% of that water to keep a healthy lawn. Most home lawns look great with <strong>about 70–80%</strong> of ET replaced in summer, and 60–70% in spring and fall (<a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20791" target="_blank">Carrow et al., 2022</a>).</p>
+
+      <h2>2) Giving Credit for Rainfall</h2>
+      <p>When it rains, your sprinklers can take a break. But not all rain soaks into the soil—some runs off or evaporates. That’s why we only count the portion that actually benefits the roots, called <em>effective rainfall</em> (<a href="https://www.fao.org/4/x5560e/x5560e03.htm" target="_blank">FAO Effective Rainfall</a>).</p>
+
+      <h2>3) How Fast Your Sprinklers Apply Water</h2>
+      <p>Every sprinkler system puts out water at a certain speed. The calculator asks for your <strong>minutes per inch</strong> value (Rate). You can figure this out by:</p>
+      <ul>
+        <li><strong>Cup test (best way):</strong> Place a few cups on the lawn, run sprinklers for 15–20 minutes, and measure how much water collected. From this, calculate how many minutes it takes to apply 1 inch (<a href="https://content.ces.ncsu.edu/landscape-irrigation-auditing-made-simple" target="_blank">NCSU Extension: Catch‑can testing</a>).</li>
+        <li><strong>Specs/math:</strong> Use gallons per minute and area formulas, but real-world testing is more reliable (<a href="https://www.rainbird.com/professionals/irrigation-design-tip-calculating-precipitation-rates" target="_blank">Rain Bird precipitation rate formula</a>).</li>
+      </ul>
+
+      <h2>4) Putting It All Together</h2>
+      <p>Following this formula, the result is the number of minutes per zone you should run your sprinklers. If that time is long, split it into two or three shorter “cycle‑and‑soak” sessions to prevent runoff.</p>
+
+      <h2>Example</h2>
+      <p>Let’s say the weather shows your lawn used about 1.1 inches of water this week. Multiply that by 0.75 (75% replacement) = 0.83 inches. It rained 0.1 inch, leaving 0.73 inches still needed. You water every 3 days (<code>W ÷ 7 = 3 ÷ 7 ≈ 0.43</code>), so each irrigation should apply about 0.31 inches. If your system takes 80 minutes to apply 1 inch of water, then runtime = 0.31 × 80 ≈ 25 minutes per zone.</p>
+
+      <h2>Why This Works</h2>
+      <p>This approach is backed by decades of turfgrass and irrigation research. Universities and organizations like the <a href="https://www.irrigation.org/" target="_blank">Irrigation Association</a> and <a href="https://www.epa.gov/watersense" target="_blank">EPA WaterSense</a> recommend this exact method.</p>
+
+      <h2>References (Research & Guidelines)</h2>
+      <ol class="refs">
+        <li><a href="https://www.fao.org/4/x5560e/x5560e00.htm" target="_blank">FAO Irrigation and Drainage Paper 56: Crop Evapotranspiration</a></li>
+        <li><a href="https://www.mesonet.org/images/site/ASCE_Evapotranspiration_Formula.pdf" target="_blank">ASCE Standardized Reference Evapotranspiration Equation</a></li>
+        <li><a href="https://www.irrigation.org/IA/FileUploads/IA/Certification/CLIA-CGIA_AuditGuidelines.pdf" target="_blank">Irrigation Association: Landscape Irrigation Audit Guidelines</a></li>
+        <li><a href="https://agrilife.org/irrigation/files/2018/06/Landscape-Water-Budgeting-manual-8-6-14.pdf" target="_blank">Texas A&M AgriLife: Landscape Water Budgeting Manual</a></li>
+        <li><a href="https://www.epa.gov/watersense/weather-based-irrigation-controllers" target="_blank">EPA WaterSense: Weather‑Based Irrigation Controllers</a></li>
+        <li><a href="https://abe.ufl.edu/faculty/mdukes/pdf/irrigation-efficiency/Romero_Dukes_Turfgrass%20ET_Crop_%20Coefficient_%20Lit.pdf" target="_blank">Romero & Dukes (2009). Turfgrass ET & Crop Coefficients Review</a></li>
+        <li><a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20791" target="_blank">Carrow et al. (2022). Cool‑season turf water requirements under deficit irrigation</a></li>
+      </ol>
+
+      <p class="small">Want to see this with your own lawn’s numbers? Go back to the calculator, enter your rainfall, sprinkler rate, and ET setting, and it will show you exactly how many minutes to run each zone.</p>
+    </div>
+  </div>
+</body>
+</html>
