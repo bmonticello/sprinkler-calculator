@@ -4,12 +4,38 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4567620933790706" crossorigin="anonymous"></script>
-<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z"/><ellipse cx="16" cy="22" rx="7" ry="7" fill="white" fill-opacity="0.5"/></svg>'>
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z"/></svg>' />
 <title>Sprinkler Runtime Calculator</title>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <div id="container">
+
+  <!-- Site navigation header -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <a class="brand" href="/">Sprinkler Calculator</a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
+        <span class="sr-only">Open menu</span>
+        <svg class="icon icon-menu" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon icon-close" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="/" aria-current="page">Home</a></li>
+          <li><a href="/pages/about.html">About</a></li>
+          <li><a href="/pages/privacy.html">Privacy</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
   <h1 id="pageTop">Sprinkler Runtime Calculator</h1>
   <br/>
   <p class="description">
@@ -25,7 +51,7 @@
     <br/>
     <code>Rate</code> = minutes to irrigate 1" of water for your sprinklers
     <br/><br/>
-    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>. The default values and formula calculate sprinkler runtime for watering every 2 days to replace 75% of rainfall-adjusted weekly ET like so: 
+    Optional: Enter your own variable values and/or runtime formula below using variables <code>W</code>, <code>ET</code>, <code>R</code>, and <code>Rate</code>. The default values and formula calculate your runtime based on weekly ET replacement of 75% minus rainfall.
     <br/><br/>
     <code> (W / 7) * (ET * 0.75 - R) * Rate</code>
   </p>
