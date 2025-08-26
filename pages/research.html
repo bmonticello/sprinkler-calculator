@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z"/><ellipse cx="16" cy="22" rx="7" ry="7" fill="white" fill-opacity="0.5"/></svg>'>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4567620933790706" crossorigin="anonymous"></script>
   <title>How It Works - Sprinkler Runtime Calculator</title>
-  <meta name="description" content="An easy, research-backed explanation of how SprinklerCalculator.com converts weather, rainfall, and your sprinkler output into minutes per zone—helping homeowners save water and keep lawns healthy.">
+  <meta name="description" content="An easy, research-backed explanation of how SprinklerCalculator.com converts weather, rainfall, and your sprinkler output into minutes per zone—helping homeowners save water and keep a healthy lawn." />
   <link rel="stylesheet" href="../css/header.css">
   <link rel="stylesheet" href="../css/styles.css">
   <style>
@@ -84,7 +84,7 @@
               <path d="M11.5 22c3 .5 6.5-.5 9-3.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </span>
-        <span class="brand-text">Sprinkler Runtime Calculator</span>
+          <span class="brand-text">Sprinkler Runtime Calculator</span>
         </a>
 
         <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
@@ -113,20 +113,20 @@
       <p class="small">A simple, research‑based way to figure out exactly how many minutes to run each of your sprinkler zones—so you save water, money, and keep your lawn green.</p>
 
       <div class="note">
-        <strong>In short:</strong> We look at how much water your grass actually needs based on the weather (FAO‑56 Penman–Monteith ET), subtract effective rainfall, and translate what’s left into minutes using your system’s output rate. This gives you right‑sized runtimes per zone.
+        <strong>In short:</strong> We look at how much water your grass actually needs based on the weather (<a href="https://www.fao.org/4/x5560e/x5560e00.htm" target="_blank" rel="noopener">FAO‑56 Penman–Monteith ET</a>), subtract <a href="https://agrilife.org/irrigation/files/2018/06/Landscape-Water-Budgeting-manual-8-6-14.pdf" target="_blank" rel="noopener">effective rainfall</a>, and translate what’s left into minutes per zone using your system’s application rate.
       </div>
 
       <h2>1) Weather Tells Us How Thirsty Your Grass Is</h2>
-      <p>Grass loses water each day through heat, sun, and wind. Scientists call this <em>ET</em> (short for evapotranspiration). Public weather networks publish ET values so we know how much water grass loses in your area.</p>
-      <p>Studies show you don’t need to replace 100% of that water to keep a healthy lawn. Most home lawns look great with <strong>about 70–80%</strong> of ET replaced in summer, and 60–70% in spring/fall. We default to <strong>75%</strong> as a practical, water‑saving baseline.</p>
+      <p>Grass loses water each day through heat, sun, and wind. Scientists call this <a href="https://www.mesonet.org/images/site/ASCE_Evapotranspiration_Formula.pdf" target="_blank" rel="noopener"><em>ET</em></a> (short for evapotranspiration). Public weather networks publish ET values so we know how much water grass would use if water were not limiting.</p>
+      <p>Studies show you don’t need to replace 100% of that water to keep a healthy lawn. Most home lawns look great with <strong>about 70–80%</strong> of ET replaced in summer, and <strong>60–70%</strong> in spring/fall (<a href="https://abe.ufl.edu/faculty/mdukes/pdf/irrigation-efficiency/Romero_Dukes_Turfgrass%20ET_Crop_%20Coefficient_%20Lit.pdf" target="_blank" rel="noopener">Romero &amp; Dukes, 2009</a>; <a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20791" target="_blank" rel="noopener">Carrow et&nbsp;al., 2022</a>).</p>
 
       <h2>2) Giving Credit for Rainfall</h2>
-      <p>When it rains, your sprinklers can take a break. But not all rain soaks into the soil—some runs off or evaporates. That’s why we only count the portion that actually benefits the roots, commonly called effective rainfall. The calculator subtracts weekly rainfall before converting the remainder into minutes.</p>
+      <p>When it rains, your sprinklers can take a break. But not all rain soaks into the soil—some runs off or evaporates. That’s why we only count the portion that actually benefits the roots, called <a href="https://agrilife.org/irrigation/files/2018/06/Landscape-Water-Budgeting-manual-8-6-14.pdf" target="_blank" rel="noopener">effective rainfall</a>.</p>
 
       <h2>3) How Fast Your Sprinklers Apply Water</h2>
       <p>Every sprinkler system puts out water at a certain speed. The calculator asks for your <strong>minutes per inch</strong> value (Rate). You can figure this out by:</p>
       <ul>
-        <li><strong>Cup test (best way):</strong> Place a few cups on the lawn, run sprinklers for 15–20 minutes, and measure how much water collected. From this, calculate how many minutes it takes to apply 1 inch.</li>
+        <li><strong><a href="https://www.irrigation.org/IA/FileUploads/IA/Certification/CLIA-CGIA_AuditGuidelines.pdf" target="_blank" rel="noopener">Cup test</a> (best way):</strong> Place a few cups on the lawn, run sprinklers for 15–20 minutes, and measure how much water collected. From this, calculate how many minutes it takes your system to apply 1 inch.</li>
         <li><strong>Specs/math:</strong> You can use gallons per minute and area formulas, but real‑world testing is more reliable (especially with mixed heads and pressure differences).</li>
       </ul>
 
@@ -139,19 +139,21 @@
         <li><strong>R</strong> = weekly total rainfall in inches for your location</li>
         <li><strong>Rate</strong> = minutes it takes your sprinklers to apply 1 inch of water</li>
       </ul>
-      <p>Following this formula, the result is the number of minutes per zone you should run your sprinklers. If that time is long, split it into two or three shorter “cycle‑and‑soak” sessions to reduce runoff and improve absorption.</p>
+      <div class="callout">
+        <p>Following this formula, the result is the number of minutes per zone you should run your sprinklers. If that time is long, split it into two or three shorter “cycle‑and‑soak” sessions to reduce runoff and improve infiltration.</p>
+      </div>
 
       <h2>Why This Works</h2>
-      <p>This approach is backed by decades of turfgrass and irrigation research. Universities and organizations like the Irrigation Association and EPA WaterSense recommend weather‑based irrigation with appropriate deficits to maintain healthy turf while conserving water.</p>
+      <p>This approach is backed by decades of turfgrass and irrigation research. Universities and organizations like the <a href="https://www.irrigation.org/IA/FileUploads/IA/Certification/CLIA-CGIA_AuditGuidelines.pdf" target="_blank" rel="noopener">Irrigation Association</a> and <a href="https://www.epa.gov/watersense/weather-based-irrigation-controllers" target="_blank" rel="noopener">EPA WaterSense</a> recommend weather‑based irrigation and water budgeting that accounts for ET and rainfall.</p>
 
       <h2>References (Research & Guidelines)</h2>
       <ol class="refs">
-        <li><a href="https://www.fao.org/4/x5560e/x5560e00.htm" target="_blank" rel="noopener">FAO Irrigation and Drainage Paper 56: Crop Evapotranspiration</a></li>
+        <li><a href="https://www.fao.org/4/x5560e/x5560e00.htm" target="_blank" rel="noopener">FAO Irrigation and Drainage Paper 56: Crop Evapotranspiration (Guidelines for computing crop water requirements)</a></li>
         <li><a href="https://www.mesonet.org/images/site/ASCE_Evapotranspiration_Formula.pdf" target="_blank" rel="noopener">ASCE Standardized Reference Evapotranspiration Equation</a></li>
         <li><a href="https://www.irrigation.org/IA/FileUploads/IA/Certification/CLIA-CGIA_AuditGuidelines.pdf" target="_blank" rel="noopener">Irrigation Association: Landscape Irrigation Audit Guidelines</a></li>
         <li><a href="https://agrilife.org/irrigation/files/2018/06/Landscape-Water-Budgeting-manual-8-6-14.pdf" target="_blank" rel="noopener">Texas A&amp;M AgriLife: Landscape Water Budgeting Manual</a></li>
         <li><a href="https://www.epa.gov/watersense/weather-based-irrigation-controllers" target="_blank" rel="noopener">EPA WaterSense: Weather‑Based Irrigation Controllers</a></li>
-        <li><a href="https://abe.ufl.edu/faculty/mdukes/pdf/irrigation-efficiency/Romero_Dukes_Turfgrass%20ET_Crop_%20Coefficient_%20Lit.pdf" target="_blank" rel="noopener">Romero &amp; Dukes (2009). Turfgrass ET &amp; Crop Coefficients</a></li>
+        <li><a href="https://abe.ufl.edu/faculty/mdukes/pdf/irrigation-efficiency/Romero_Dukes_Turfgrass%20ET_Crop_%20Coefficient_%20Lit.pdf" target="_blank" rel="noopener">Romero &amp; Dukes (2009). Turfgrass ET, Crop Coefficients, and Irrigation Scheduling: Literature Review</a></li>
         <li><a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20791" target="_blank" rel="noopener">Carrow et al. (2022). Cool‑season turf water requirements under deficit irrigation</a></li>
       </ol>
 
@@ -170,7 +172,7 @@
     var el = document.getElementById('copyrightYear');
     if (el) el.textContent = new Date().getFullYear();
   });
-</script>
+  </script>
   <script src="../js/header.js"></script>
 </body>
 </html>
