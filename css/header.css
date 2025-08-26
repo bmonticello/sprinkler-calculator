@@ -11,6 +11,13 @@
   --active-bg: rgba(14, 165, 233, 0.12);
   --active-ring: rgba(14, 165, 233, 0.35);
   --shadow: 0 6px 24px rgba(2, 6, 23, 0.08), 0 1px 1px rgba(2, 6, 23, 0.06);
+
+  /* Header spacing variables */
+  --header-py: 16px;         /* increased vertical padding (was 12px) */
+  --header-px: 16px;         /* keep horizontal padding the same */
+  --header-py-scrolled: 8px; /* desktop shrink matches previous look */
+  /* Mobile menu offset = toggle height (≈40px) + 2 * vertical padding */
+  --header-mobile-offset: calc(40px + (var(--header-py) * 2));
 }
 
 /* Accessibility: skip link */
@@ -54,7 +61,7 @@
 .header-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 12px 16px;
+  padding: var(--header-py) var(--header-px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -162,7 +169,7 @@ body.nav-open .nav-overlay {
 @media (max-width: 767.98px) {
   .primary-nav {
     position: fixed;
-    top: calc(56px + env(safe-area-inset-top));
+    top: calc(var(--header-mobile-offset) + env(safe-area-inset-top));
     right: 12px; left: 12px;
     background: white;
     border: 1px solid rgba(2,6,23,0.08);
@@ -195,10 +202,10 @@ body.nav-open .nav-overlay {
   }
 }
 
-/* Slight shrink on scroll for header content */
+/* Slight shrink on scroll for header content (desktop only) */
 @media (min-width: 768px) {
   .site-header.scrolled .header-inner {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: var(--header-py-scrolled);
+    padding-bottom: var(--header-py-scrolled);
   }
 }
