@@ -39,10 +39,50 @@
   pre{background:#f8fafc;padding:12px;border-radius:8px;overflow-x:auto}
   code{font-family:ui-monospace,monospace}
 </style>
+<link rel="stylesheet" href="css/header.css">
 </head>
 <body>
   <div class="wrap">
     <div class="card">
+      <!-- Site navigation header -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="Sprinkler Calculator Home">
+        <span class="brand-logo" aria-hidden="true">
+          <!-- Water droplet + leaf logo -->
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#25A6F7"/>
+                <stop offset="1" stop-color="#0AC2A5"/>
+              </linearGradient>
+            </defs>
+            <path d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z" fill="url(#g1)"/>
+            <path d="M11.5 22c3 .5 6.5-.5 9-3.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">Sprinkler Calculator</span>
+      </a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
+        <span class="sr-only">Open menu</span>
+        <svg class="icon icon-menu" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon icon-close" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="/pages/research.html">Research</a></li>
+          <li><a href="/pages/about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div id="navOverlay" class="nav-overlay" hidden></div>
       <h1>How This Calculator Works</h1>
       <p class="small">A simple, research‑based way to figure out exactly how many minutes to run each sprinkler zone—so you save water, money, and keep your lawn green.</p>
 
@@ -97,7 +137,16 @@
       </ol>
 
       <p class="small">Want to see this with your own lawn’s numbers? Go back to the calculator, enter your rainfall, sprinkler rate, and ET setting, and it will show you exactly how many minutes to run each zone.</p>
+    <br /><br /><br /> 
+  <footer>
+    <p>
+      <a href="/pages/privacy.html">Privacy Policy</a>
+    </p>
+    <p>Contact: <a href="mailto:b.monticello23@gmail.com">b.monticello23@gmail.com</a></p>
+    <p>&copy; 2025 Sprinkler Runtime Calculator</p>
+  </footer>
     </div>
   </div>
+<script src="js/header.js"></script>
 </body>
 </html>
