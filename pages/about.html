@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4567620933790706" crossorigin="anonymous"></script>
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="deepskyblue" d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z"/><ellipse cx="16" cy="22" rx="7" ry="7" fill="white" fill-opacity="0.5"/></svg>'>
+  <link rel="stylesheet" href="css/header.css">
   <title>About - Sprinkler Runtime Calculator</title>
   <style>
     body {
@@ -39,6 +40,45 @@
 </head>
 <body>
   <div id="container">
+    <!-- Site navigation header -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="Sprinkler Calculator Home">
+        <span class="brand-logo" aria-hidden="true">
+          <!-- Water droplet + leaf logo -->
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#25A6F7"/>
+                <stop offset="1" stop-color="#0AC2A5"/>
+              </linearGradient>
+            </defs>
+            <path d="M16 2C10 13 4 18 4 22a12 12 0 0024 0c0-4-6-9-12-20z" fill="url(#g1)"/>
+            <path d="M11.5 22c3 .5 6.5-.5 9-3.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">Sprinkler Calculator</span>
+      </a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
+        <span class="sr-only">Open menu</span>
+        <svg class="icon icon-menu" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon icon-close" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="/pages/research.html">Research</a></li>
+          <li><a href="/pages/about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div id="navOverlay" class="nav-overlay" hidden></div>
     <h1>About Sprinkler Runtime Calculator</h1>
     <p>
       Sprinkler Runtime Calculator is a simple, user-friendly tool designed to help homeowners and gardeners calculate water requirements for their sprinkler systems quickly and accurately.
@@ -49,9 +89,15 @@
     <p>
       We value your privacy and never collect personal data without your consent. For details, please see our <a href="/pages/privacy.html">Privacy Policy</a>.
     </p>
-    <p style="text-align:center; margin-top:2rem;">
-      <a href="../">← Back to Calculator</a>
+    <br /><br /><br /> 
+  <footer>
+    <p>
+      <a href="/pages/privacy.html">Privacy Policy</a>
     </p>
+    <p>Contact: <a href="mailto:b.monticello23@gmail.com">b.monticello23@gmail.com</a></p>
+    <p>&copy; 2025 Sprinkler Runtime Calculator</p>
+  </footer>
   </div>
+<script src="js/header.js"></script>
 </body>
 </html>
